@@ -42,32 +42,13 @@
         }
     </script>
     <style>
-        * { cursor: none; }
         html { scroll-behavior: auto; }
         body {
             text-rendering: geometricPrecision;
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
-            background: #0f0c18;
+            background: #fafaf8;
         }
-
-        .cursor-dot {
-            width: 8px; height: 8px;
-            background: #c9a84c;
-            border-radius: 50%;
-            position: fixed; top: 0; left: 0;
-            pointer-events: none; z-index: 9999;
-            mix-blend-mode: difference;
-        }
-        .cursor-ring {
-            width: 40px; height: 40px;
-            border: 1.5px solid rgba(201,168,76,0.5);
-            border-radius: 50%;
-            position: fixed; top: 0; left: 0;
-            pointer-events: none; z-index: 9998;
-            transition: width 0.3s, height 0.3s, border-color 0.3s;
-        }
-        .cursor-ring.hovering { width: 60px; height: 60px; border-color: rgba(201,168,76,0.9); }
 
         .loader {
             position: fixed; inset: 0; z-index: 10000;
@@ -77,89 +58,40 @@
         .loader-line { width: 0; height: 1px; background: linear-gradient(90deg, transparent, #c9a84c, transparent); }
         .loader-text {
             font-family: 'Playfair Display', serif;
-            color: #c9a84c; font-size: 14px;
-            letter-spacing: 8px; text-transform: uppercase; opacity: 0;
+            color: #c9a84c; font-size: 13px;
+            letter-spacing: 6px; text-transform: uppercase; opacity: 0;
         }
 
-        .noise-overlay {
-            position: fixed; inset: 0; pointer-events: none; z-index: 9000; opacity: 0.03;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-            background-repeat: repeat; background-size: 256px 256px;
-        }
-
-        .reveal { opacity: 0; transform: translateY(40px); }
-        .reveal-left { opacity: 0; transform: translateX(-60px); }
-        .reveal-right { opacity: 0; transform: translateX(60px); }
-        .reveal-scale { opacity: 0; transform: scale(0.92); }
-
-        .glow-orb {
-            position: absolute; border-radius: 50%;
-            filter: blur(80px); pointer-events: none; opacity: 0.15;
-        }
-
-        .magnetic-btn {
-            position: relative; display: inline-block;
-            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        #particles-canvas {
-            position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: 0.4;
-        }
-
-        .glass {
-            background: rgba(255,255,255,0.03);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.06);
-        }
+        .reveal { opacity: 0; transform: translateY(24px); }
+        .reveal-left { opacity: 0; transform: translateX(-30px); }
+        .reveal-right { opacity: 0; transform: translateX(30px); }
+        .reveal-scale { opacity: 0; transform: scale(0.96); }
 
         .stat-value { font-variant-numeric: tabular-nums; }
 
         .scroll-progress {
             position: fixed; top: 0; left: 0;
-            height: 2px; width: 0%;
-            background: linear-gradient(90deg, #c9a84c, #dfc07a);
+            height: 1px; width: 0%;
+            background: #c9a84c;
             z-index: 9001;
         }
 
         .nav-link { position: relative; }
         .nav-link::after {
-            content: ''; position: absolute; bottom: -4px; left: 50%; width: 0; height: 1.5px;
+            content: ''; position: absolute; bottom: -4px; left: 50%; width: 0; height: 1px;
             background: #c9a84c;
-            transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: width 0.4s ease, left 0.4s ease;
         }
         .nav-link:hover::after { width: 100%; left: 0; }
+        .nav-link.is-active { color: #fff; }
+        .nav-link.is-active::after { width: 100%; left: 0; }
 
-        .tilt-card {
-            transform-style: preserve-3d; perspective: 1000px;
-            transition: transform 0.1s ease-out;
-        }
-        .tilt-card-inner { transform: translateZ(20px); transition: transform 0.3s; }
-
-        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-        .marquee-track { animation: marquee 30s linear infinite; }
-
-        /* Activities horizontal scroll - compact cards */
-        .activities-track { display: flex; gap: 24px; width: max-content; padding: 40px 8vw; }
-        .activity-card {
-            width: 380px; flex-shrink: 0;
-            transition: transform 0.1s ease-out;
-            transform-style: preserve-3d; perspective: 1000px;
-        }
-
-        @media (max-width: 768px) {
-            * { cursor: auto; }
-            .cursor-dot, .cursor-ring { display: none; }
-            .activity-card { width: 85vw; }
-        }
+        .rule { height: 1px; background: rgba(201,168,76,0.25); display: block; }
     </style>
 </head>
 <body class="font-sans text-gray-400">
 
-    <div class="noise-overlay"></div>
-    <div class="cursor-dot"></div>
-    <div class="cursor-ring"></div>
     <div class="scroll-progress"></div>
-    <canvas id="particles-canvas"></canvas>
 
     <!-- LOADER -->
     <div class="loader" id="loader">
@@ -218,32 +150,26 @@
     <!-- HERO -->
     <section id="hero" class="relative h-screen flex items-center overflow-hidden">
         <div class="absolute inset-0" style="background: radial-gradient(ellipse at 20% 50%, #2c2345 0%, #1a1433 40%, #0f0c18 80%);"></div>
-        <div class="glow-orb w-[600px] h-[600px] bg-vp-mid -top-40 -right-40" id="orb1"></div>
-        <div class="glow-orb w-[400px] h-[400px] bg-vp-gold bottom-0 left-[10%]" id="orb2"></div>
-        <div class="glow-orb w-[300px] h-[300px] bg-vp-soft top-[60%] right-[20%]" id="orb3"></div>
         <div class="absolute inset-0 opacity-[0.04]" style="background-image: linear-gradient(rgba(201,168,76,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.3) 1px, transparent 1px); background-size: 80px 80px;"></div>
 
         <div class="relative z-10 max-w-6xl mx-auto px-6 md:px-12 w-full">
-            <div class="max-w-3xl">
-                <p class="text-vp-gold text-[12px] font-bold uppercase tracking-[6px] mb-6 overflow-hidden" id="hero-label">
-                    <span class="inline-block">Boutique de Banca de Inversi&oacute;n</span>
+            <div class="max-w-4xl">
+                <p class="text-vp-gold text-[11px] font-bold uppercase tracking-[5px] mb-8 overflow-hidden" id="hero-label">
+                    <span class="inline-block">ValPer &middot; Boutique de Banca de Inversi&oacute;n</span>
                 </p>
-                <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl font-normal text-white leading-[1.1] mb-8" id="hero-title">
-                    Inteligencia<br><em class="text-vp-gold-light">Financiera</em>
+                <h1 class="font-serif text-4xl md:text-6xl lg:text-[78px] font-normal text-white leading-[1.08] mb-10 max-w-3xl" id="hero-title">
+                    Estructuraci&oacute;n de <em class="text-vp-gold-light">deuda y capital</em> para empresas mexicanas medianas y grandes.
                 </h1>
-                <p class="text-gray-400 text-lg md:text-xl leading-relaxed max-w-xl mb-10" id="hero-desc">
-                    Estructuramos recursos financieros &mdash;en forma de capital y/o deuda&mdash; para impulsar el crecimiento de empresas grandes y medianas en diversos sectores econ&oacute;micos.
+                <p class="text-gray-400 text-base md:text-lg leading-[1.7] max-w-xl mb-12" id="hero-desc">
+                    Acompa&ntilde;amos a directores generales, CFOs y accionistas en la obtenci&oacute;n de financiamiento, desde el dise&ntilde;o de la estructura hasta el cierre con bancos, fondos y otras fuentes institucionales.
                 </p>
-                <div class="flex flex-wrap gap-4" id="hero-ctas">
-                    <a href="#compania" class="magnetic-btn inline-flex items-center gap-3 border border-white/20 text-white px-8 py-4 text-[12px] font-bold uppercase tracking-[2px] hover:bg-white hover:text-vp-deep transition duration-500 group">
-                        <span>Con&oacute;cenos</span>
+                <div class="flex flex-wrap items-center gap-8" id="hero-ctas">
+                    <a href="#contacto" class="inline-flex items-center gap-3 bg-vp-gold text-vp-deep px-8 py-4 text-[11px] font-bold uppercase tracking-[3px] hover:bg-vp-gold-light transition duration-500 group">
+                        <span>Hablemos de su transacci&oacute;n</span>
                         <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                     </a>
-                    <a href="#productos" class="magnetic-btn inline-flex items-center gap-3 bg-vp-gold/10 border border-vp-gold/30 text-vp-gold px-8 py-4 text-[12px] font-bold uppercase tracking-[2px] hover:bg-vp-gold hover:text-vp-deep transition duration-500">
-                        <span>Nuestras Soluciones</span>
-                    </a>
+                    <a href="#productos" class="text-[11px] text-gray-400 hover:text-vp-gold uppercase tracking-[3px] font-bold transition duration-500">Ver soluciones &rarr;</a>
                 </div>
-                <p class="mt-10 text-[10px] text-gray-600 uppercase tracking-[3px]">Actualizado &bull; Abril 2026</p>
             </div>
         </div>
 
@@ -255,31 +181,8 @@
         </div>
     </section>
 
-    <!-- STAT STRIP (414 Capital-inspired horizontal credibility band) -->
-    <section class="relative bg-vp-deep border-y border-vp-gold/10">
-        <div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-2 md:grid-cols-4 divide-x divide-vp-gold/10">
-            <div class="px-4 md:px-8 text-center md:text-left">
-                <p class="font-serif text-3xl md:text-4xl text-white">+<span class="stat-value" data-target="2000">0</span><span class="text-vp-gold text-lg ml-1">M</span></p>
-                <p class="text-[10px] uppercase tracking-[3px] text-vp-gold/80 mt-2">USD en operaciones</p>
-            </div>
-            <div class="px-4 md:px-8 text-center md:text-left">
-                <p class="font-serif text-3xl md:text-4xl text-white">+<span class="stat-value" data-target="50">0</span></p>
-                <p class="text-[10px] uppercase tracking-[3px] text-vp-gold/80 mt-2">A&ntilde;os combinados</p>
-            </div>
-            <div class="px-4 md:px-8 text-center md:text-left">
-                <p class="font-serif text-3xl md:text-4xl text-white"><span class="stat-value" data-target="4">0</span></p>
-                <p class="text-[10px] uppercase tracking-[3px] text-vp-gold/80 mt-2">Sectores principales</p>
-            </div>
-            <div class="px-4 md:px-8 text-center md:text-left">
-                <p class="font-serif text-3xl md:text-4xl text-white"><span class="stat-value" data-target="8">0</span></p>
-                <p class="text-[10px] uppercase tracking-[3px] text-vp-gold/80 mt-2">Esquemas de financiamiento</p>
-            </div>
-        </div>
-    </section>
-
     <!-- COMPA&Ntilde;&Iacute;A -->
     <section id="compania" class="relative py-32 px-6 bg-vp-cream overflow-hidden">
-        <div class="glow-orb w-[500px] h-[500px] bg-vp-gold/20 -top-40 right-0"></div>
         <div class="max-w-5xl mx-auto relative z-10">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                 <div>
@@ -302,9 +205,9 @@
                     </div>
                 </div>
                 <div class="reveal-right">
-                    <div class="tilt-card bg-white shadow-2xl shadow-vp-mid/10 p-10 relative">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-vp-gold via-vp-mid to-vp-gold"></div>
-                        <div class="tilt-card-inner space-y-8">
+                    <div class="bg-white shadow-xl shadow-vp-mid/5 p-10 relative border border-gray-100">
+                        <div class="absolute top-0 left-0 w-full h-[2px] bg-vp-gold"></div>
+                        <div class="space-y-8">
                             <div>
                                 <p class="font-serif text-5xl text-vp-deep">+<span class="stat-value" data-target="50">0</span></p>
                                 <p class="text-[13px] uppercase tracking-[2px] text-gray-400 mt-1">A&ntilde;os de experiencia combinada</p>
@@ -326,463 +229,313 @@
         </div>
     </section>
 
-    <!-- CREDENCIALES MARQUEE -->
-    <section id="credenciales" class="relative py-20 bg-vp-deep overflow-hidden">
-        <div class="absolute inset-0" style="background: radial-gradient(ellipse at 50% 50%, #2c2345 0%, #1a1433 100%);"></div>
-        <div class="relative z-10">
-            <p class="reveal text-center text-vp-gold text-[12px] font-bold uppercase tracking-[5px] mb-12">Experiencia</p>
-            <div class="overflow-hidden py-6 border-y border-white/5">
-                <div class="marquee-track flex items-center gap-20 whitespace-nowrap">
-                    <span class="text-6xl md:text-8xl font-serif text-white/10">+USD $2,000 Millones</span>
-                    <span class="text-vp-gold text-2xl">&bull;</span>
-                    <span class="text-6xl md:text-8xl font-serif text-white/10">+50 A&ntilde;os de Experiencia</span>
-                    <span class="text-vp-gold text-2xl">&bull;</span>
-                    <span class="text-6xl md:text-8xl font-serif text-white/10">Banca de Inversi&oacute;n</span>
-                    <span class="text-vp-gold text-2xl">&bull;</span>
-                    <span class="text-6xl md:text-8xl font-serif text-white/10">Soluciones a la Medida</span>
-                    <span class="text-vp-gold text-2xl">&bull;</span>
-                    <span class="text-6xl md:text-8xl font-serif text-white/10">+USD $2,000 Millones</span>
-                    <span class="text-vp-gold text-2xl">&bull;</span>
-                    <span class="text-6xl md:text-8xl font-serif text-white/10">+50 A&ntilde;os de Experiencia</span>
-                    <span class="text-vp-gold text-2xl">&bull;</span>
-                    <span class="text-6xl md:text-8xl font-serif text-white/10">Banca de Inversi&oacute;n</span>
-                    <span class="text-vp-gold text-2xl">&bull;</span>
-                    <span class="text-6xl md:text-8xl font-serif text-white/10">Soluciones a la Medida</span>
-                    <span class="text-vp-gold text-2xl">&bull;</span>
+    <!-- CREDENCIALES (sobrio, sin marquee) -->
+    <section id="credenciales" class="relative py-24 bg-vp-deep">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+                <div class="lg:col-span-4">
+                    <p class="reveal text-vp-gold text-[10px] font-bold uppercase tracking-[4px] mb-5">Track Record</p>
+                    <h2 class="reveal font-serif text-3xl md:text-4xl text-white leading-[1.2] mb-6">Una trayectoria <em class="text-vp-gold-light">verificable</em>.</h2>
+                    <p class="reveal text-gray-400 text-[15px] leading-[1.8]">Cifras y experiencia acumulada de los socios y colaboradores a lo largo de su carrera en el sistema financiero nacional e internacional.</p>
                 </div>
-            </div>
-            <div class="max-w-5xl mx-auto mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 px-6">
-                <div class="reveal glass rounded-sm p-8 text-left group hover:bg-white/[0.06] transition duration-700">
-                    <p class="font-serif text-5xl text-white mb-3">+$<span class="stat-value" data-target="2000">0</span>M</p>
-                    <p class="text-vp-gold text-[12px] font-bold uppercase tracking-[2px] mb-3">Operaciones USD</p>
-                    <p class="text-gray-500 text-[14px] leading-[1.8]">Participaci&oacute;n en operaciones de financiamiento por un monto superior a USD $2,000 millones en diversos sectores econ&oacute;micos del pa&iacute;s.</p>
-                </div>
-                <div class="reveal glass rounded-sm p-8 text-left group hover:bg-white/[0.06] transition duration-700">
-                    <p class="font-serif text-5xl text-white mb-3">+<span class="stat-value" data-target="50">0</span></p>
-                    <p class="text-vp-gold text-[12px] font-bold uppercase tracking-[2px] mb-3">A&ntilde;os Combinados</p>
-                    <p class="text-gray-500 text-[14px] leading-[1.8]">Experiencia combinada en el sistema financiero nacional e internacional estructurando operaciones para empresas l&iacute;deres.</p>
-                </div>
-                <div class="reveal glass rounded-sm p-8 text-left group hover:bg-white/[0.06] transition duration-700">
-                    <p class="font-serif text-5xl text-white mb-3">A la <em class="text-vp-gold-light not-italic">medida</em></p>
-                    <p class="text-vp-gold text-[12px] font-bold uppercase tracking-[2px] mb-3">An&aacute;lisis Profundo</p>
-                    <p class="text-gray-500 text-[14px] leading-[1.8]">Alta capacidad de an&aacute;lisis y entendimiento del negocio, permiti&eacute;ndonos dise&ntilde;ar soluciones financieras a la medida para cada cliente.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- PROCESO DE EJECUCI&Oacute;N (Horizontal Scroll - 5 pasos del PDF) -->
-    <section id="proceso" class="relative bg-vp-cream">
-        <div class="py-20 px-6 text-center max-w-3xl mx-auto">
-            <p class="reveal text-vp-gold text-[12px] font-bold uppercase tracking-[5px] mb-5">Proceso de Ejecuci&oacute;n</p>
-            <h2 class="reveal font-serif text-4xl md:text-5xl text-vp-deep mb-6">C&oacute;mo Trabajamos</h2>
-            <p class="reveal text-gray-500 text-[16px] leading-[1.9]">Buscamos las mejores condiciones de mercado posibles para nuestros clientes, de forma profesional, estructurada y transparente.</p>
-        </div>
-
-        <div class="overflow-hidden pb-20" id="activities-wrapper">
-            <div class="activities-track" id="activities-track">
-                <!-- Paso 1: Due Diligence -->
-                <div class="activity-card">
-                    <div class="bg-white shadow-xl shadow-vp-mid/5 p-10 relative overflow-hidden group h-full">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-vp-mid group-hover:bg-vp-gold transition-colors duration-700"></div>
-                        <div class="w-14 h-14 mb-6 rounded-full bg-vp-mid/10 flex items-center justify-center group-hover:bg-vp-gold/10 transition duration-700">
-                            <svg class="w-7 h-7 text-vp-mid group-hover:text-vp-gold transition duration-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                        </div>
-                        <span class="text-[11px] text-vp-gold font-bold uppercase tracking-[3px]">01</span>
-                        <h3 class="text-[19px] font-serif text-vp-deep mt-2 mb-4">Debida Diligencia</h3>
-                        <p class="text-[15px] text-gray-500 leading-[1.8]">An&aacute;lisis del negocio y estructuraci&oacute;n: dise&ntilde;amos el financiamiento m&aacute;s adecuado para cada caso mediante un Due Diligence profundo.</p>
+                <div class="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/10">
+                    <div class="reveal py-6 sm:py-2 sm:pr-8">
+                        <p class="font-serif text-4xl md:text-5xl text-white">+$<span class="stat-value" data-target="2000">0</span><span class="text-vp-gold text-xl ml-1">M</span></p>
+                        <p class="text-[10px] uppercase tracking-[3px] text-vp-gold/80 mt-3">USD en operaciones de financiamiento</p>
                     </div>
-                </div>
-                <!-- Paso 2: Memorando Informativo -->
-                <div class="activity-card">
-                    <div class="bg-white shadow-xl shadow-vp-mid/5 p-10 relative overflow-hidden group h-full">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-vp-mid group-hover:bg-vp-gold transition-colors duration-700"></div>
-                        <div class="w-14 h-14 mb-6 rounded-full bg-vp-mid/10 flex items-center justify-center group-hover:bg-vp-gold/10 transition duration-700">
-                            <svg class="w-7 h-7 text-vp-mid group-hover:text-vp-gold transition duration-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        </div>
-                        <span class="text-[11px] text-vp-gold font-bold uppercase tracking-[3px]">02</span>
-                        <h3 class="text-[19px] font-serif text-vp-deep mt-2 mb-4">Memorando Informativo</h3>
-                        <p class="text-[15px] text-gray-500 leading-[1.8]">Elaboraci&oacute;n del Memorando con la informaci&oacute;n cualitativa y cuantitativa m&aacute;s relevante para presentar la transacci&oacute;n a las fuentes de financiamiento.</p>
+                    <div class="reveal py-6 sm:py-2 sm:px-8">
+                        <p class="font-serif text-4xl md:text-5xl text-white">+<span class="stat-value" data-target="50">0</span></p>
+                        <p class="text-[10px] uppercase tracking-[3px] text-vp-gold/80 mt-3">A&ntilde;os de experiencia combinada</p>
                     </div>
-                </div>
-                <!-- Paso 3: Acceso al Mercado -->
-                <div class="activity-card">
-                    <div class="bg-white shadow-xl shadow-vp-mid/5 p-10 relative overflow-hidden group h-full">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-vp-mid group-hover:bg-vp-gold transition-colors duration-700"></div>
-                        <div class="w-14 h-14 mb-6 rounded-full bg-vp-mid/10 flex items-center justify-center group-hover:bg-vp-gold/10 transition duration-700">
-                            <svg class="w-7 h-7 text-vp-mid group-hover:text-vp-gold transition duration-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        </div>
-                        <span class="text-[11px] text-vp-gold font-bold uppercase tracking-[3px]">03</span>
-                        <h3 class="text-[19px] font-serif text-vp-deep mt-2 mb-4">Acceso al Mercado</h3>
-                        <p class="text-[15px] text-gray-500 leading-[1.8]">Coordinamos el acercamiento, seguimiento y gesti&oacute;n con los distintos jugadores del mercado &mdash;bancos, fondos, etc.&mdash; en todas las etapas.</p>
-                    </div>
-                </div>
-                <!-- Paso 4: Obtenci&oacute;n de Propuestas -->
-                <div class="activity-card">
-                    <div class="bg-white shadow-xl shadow-vp-mid/5 p-10 relative overflow-hidden group h-full">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-vp-mid group-hover:bg-vp-gold transition-colors duration-700"></div>
-                        <div class="w-14 h-14 mb-6 rounded-full bg-vp-mid/10 flex items-center justify-center group-hover:bg-vp-gold/10 transition duration-700">
-                            <svg class="w-7 h-7 text-vp-mid group-hover:text-vp-gold transition duration-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                        </div>
-                        <span class="text-[11px] text-vp-gold font-bold uppercase tracking-[3px]">04</span>
-                        <h3 class="text-[19px] font-serif text-vp-deep mt-2 mb-4">Obtenci&oacute;n de Propuestas</h3>
-                        <p class="text-[15px] text-gray-500 leading-[1.8]">Obtenci&oacute;n y negociaci&oacute;n de Cartas de T&eacute;rminos y Condiciones Preliminares por parte de una o m&aacute;s fuentes de financiamiento.</p>
-                    </div>
-                </div>
-                <!-- Paso 5: Cierre -->
-                <div class="activity-card">
-                    <div class="bg-white shadow-xl shadow-vp-mid/5 p-10 relative overflow-hidden group h-full">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-vp-mid group-hover:bg-vp-gold transition-colors duration-700"></div>
-                        <div class="w-14 h-14 mb-6 rounded-full bg-vp-mid/10 flex items-center justify-center group-hover:bg-vp-gold/10 transition duration-700">
-                            <svg class="w-7 h-7 text-vp-mid group-hover:text-vp-gold transition duration-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 13l4 4L19 7"/></svg>
-                        </div>
-                        <span class="text-[11px] text-vp-gold font-bold uppercase tracking-[3px]">05</span>
-                        <h3 class="text-[19px] font-serif text-vp-deep mt-2 mb-4">Cierre y Disposici&oacute;n</h3>
-                        <p class="text-[15px] text-gray-500 leading-[1.8]">Supervisamos todo el proceso legal, documental y operativo hasta el cierre efectivo de la transacci&oacute;n y disposici&oacute;n de los recursos.</p>
-                    </div>
-                </div>
-                <!-- Card final: Honorario de &Eacute;xito -->
-                <div class="activity-card">
-                    <div class="bg-vp-deep shadow-2xl shadow-vp-mid/20 p-10 relative overflow-hidden group h-full">
-                        <div class="absolute top-0 left-0 w-1 h-full bg-vp-gold"></div>
-                        <div class="absolute inset-0 opacity-5" style="background-image: linear-gradient(rgba(201,168,76,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.5) 1px, transparent 1px); background-size: 40px 40px;"></div>
-                        <div class="relative z-10">
-                            <div class="w-14 h-14 mb-6 rounded-full bg-vp-gold/20 flex items-center justify-center">
-                                <svg class="w-7 h-7 text-vp-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            </div>
-                            <span class="text-[11px] text-vp-gold font-bold uppercase tracking-[3px]">Honorarios</span>
-                            <h3 class="text-[19px] font-serif text-white mt-2 mb-4">Honorario de &Eacute;xito</h3>
-                            <p class="text-[15px] text-gray-400 leading-[1.8]">Porcentaje del monto obtenido, definido seg&uacute;n el perfil del cliente, la complejidad y el plazo. Se acuerda por escrito en una <em class="text-vp-gold-light not-italic">carta mandato</em> antes de iniciar.</p>
-                        </div>
+                    <div class="reveal py-6 sm:py-2 sm:pl-8">
+                        <p class="font-serif text-4xl md:text-5xl text-white"><span class="stat-value" data-target="4">0</span></p>
+                        <p class="text-[10px] uppercase tracking-[3px] text-vp-gold/80 mt-3">Sectores principales atendidos</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- PRODUCTOS (8 esquemas diferenciados del PDF) -->
-    <section id="productos" class="relative py-32 px-6 bg-white overflow-hidden">
-        <div class="glow-orb w-[500px] h-[500px] bg-vp-gold/10 top-20 -left-40"></div>
-        <div class="max-w-6xl mx-auto relative z-10">
-            <div class="text-center mb-20 max-w-3xl mx-auto">
-                <p class="reveal text-vp-gold text-[12px] font-bold uppercase tracking-[5px] mb-5">Soluciones</p>
-                <h2 class="reveal font-serif text-4xl md:text-5xl text-vp-deep mb-6">Esquemas Diferenciados de Financiamiento</h2>
-                <p class="reveal text-gray-500 text-[16px] leading-[1.9]">En nuestras soluciones financieras manejamos los siguientes esquemas para la obtenci&oacute;n de recursos.</p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- 1. Cr&eacute;ditos sindicados -->
-                <div class="reveal group bg-vp-smoke border border-gray-100 p-8 relative overflow-hidden transition-all duration-700 hover:border-vp-mid/20 hover:shadow-xl hover:shadow-vp-mid/5">
-                    <div class="absolute top-0 left-0 right-0 h-[2px] bg-vp-mid scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-700"></div>
-                    <span class="text-[10px] font-bold tracking-[3px] text-vp-gold uppercase">01</span>
-                    <h3 class="font-serif text-[19px] text-vp-deep mt-2 mb-3 leading-[1.3]">Cr&eacute;ditos Sindicados</h3>
-                    <p class="text-[14px] text-gray-500 leading-[1.8]">Dos o m&aacute;s bancos actuando conjuntamente para el otorgamiento del financiamiento.</p>
-                </div>
-                <!-- 2. Arrendamiento puro / S&LB -->
-                <div class="reveal group bg-vp-smoke border border-gray-100 p-8 relative overflow-hidden transition-all duration-700 hover:border-vp-mid/20 hover:shadow-xl hover:shadow-vp-mid/5" style="transition-delay: 0.05s;">
-                    <div class="absolute top-0 left-0 right-0 h-[2px] bg-vp-mid scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-700"></div>
-                    <span class="text-[10px] font-bold tracking-[3px] text-vp-gold uppercase">02</span>
-                    <h3 class="font-serif text-[19px] text-vp-deep mt-2 mb-3 leading-[1.3]">Arrendamiento Puro (S&amp;LB)</h3>
-                    <p class="text-[14px] text-gray-500 leading-[1.8]">Maquinaria, equipo y veh&iacute;culos fuera de balance: amarillo, minero, pasajeros, flotillas, etc.</p>
-                </div>
-                <!-- 3. Financiamiento estructurado en activos -->
-                <div class="reveal group bg-vp-smoke border border-gray-100 p-8 relative overflow-hidden transition-all duration-700 hover:border-vp-mid/20 hover:shadow-xl hover:shadow-vp-mid/5" style="transition-delay: 0.1s;">
-                    <div class="absolute top-0 left-0 right-0 h-[2px] bg-vp-mid scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-700"></div>
-                    <span class="text-[10px] font-bold tracking-[3px] text-vp-gold uppercase">03</span>
-                    <h3 class="font-serif text-[19px] text-vp-deep mt-2 mb-3 leading-[1.3]">Asset-Based Lending</h3>
-                    <p class="text-[14px] text-gray-500 leading-[1.8]">Revolventes en base de endeudamiento, reportos y l&iacute;neas de pre-exportaci&oacute;n para capital de trabajo.</p>
-                </div>
-                <!-- 4. Factoraje -->
-                <div class="reveal group bg-vp-smoke border border-gray-100 p-8 relative overflow-hidden transition-all duration-700 hover:border-vp-mid/20 hover:shadow-xl hover:shadow-vp-mid/5" style="transition-delay: 0.15s;">
-                    <div class="absolute top-0 left-0 right-0 h-[2px] bg-vp-mid scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-700"></div>
-                    <span class="text-[10px] font-bold tracking-[3px] text-vp-gold uppercase">04</span>
-                    <h3 class="font-serif text-[19px] text-vp-deep mt-2 mb-3 leading-[1.3]">Factoraje Clientes / Proveedores</h3>
-                    <p class="text-[14px] text-gray-500 leading-[1.8]">Esquemas nacionales para liberar capital de trabajo a trav&eacute;s de cuentas por cobrar o por pagar.</p>
-                </div>
-                <!-- 5. Factoraje internacional -->
-                <div class="reveal group bg-vp-smoke border border-gray-100 p-8 relative overflow-hidden transition-all duration-700 hover:border-vp-gold/30 hover:shadow-xl hover:shadow-vp-gold/5">
-                    <div class="absolute top-0 left-0 right-0 h-[2px] bg-vp-gold scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-700"></div>
-                    <span class="text-[10px] font-bold tracking-[3px] text-vp-gold uppercase">05</span>
-                    <h3 class="font-serif text-[19px] text-vp-deep mt-2 mb-3 leading-[1.3]">Factoraje Internacional</h3>
-                    <p class="text-[14px] text-gray-500 leading-[1.8]">Para exportadores de frutas y hortalizas: anticipo del ~80% del valor de la factura, sin garant&iacute;as.</p>
-                </div>
-                <!-- 6. Refinanciamiento -->
-                <div class="reveal group bg-vp-smoke border border-gray-100 p-8 relative overflow-hidden transition-all duration-700 hover:border-vp-mid/20 hover:shadow-xl hover:shadow-vp-mid/5" style="transition-delay: 0.05s;">
-                    <div class="absolute top-0 left-0 right-0 h-[2px] bg-vp-mid scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-700"></div>
-                    <span class="text-[10px] font-bold tracking-[3px] text-vp-gold uppercase">06</span>
-                    <h3 class="font-serif text-[19px] text-vp-deep mt-2 mb-3 leading-[1.3]">Refinanciamiento de Deuda</h3>
-                    <p class="text-[14px] text-gray-500 leading-[1.8]">Reestructuraci&oacute;n de pasivos existentes en mejores condiciones de plazo, costo y garant&iacute;as.</p>
-                </div>
-                <!-- 7. Cr&eacute;ditos a la medida -->
-                <div class="reveal group bg-vp-smoke border border-gray-100 p-8 relative overflow-hidden transition-all duration-700 hover:border-vp-mid/20 hover:shadow-xl hover:shadow-vp-mid/5" style="transition-delay: 0.1s;">
-                    <div class="absolute top-0 left-0 right-0 h-[2px] bg-vp-mid scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-700"></div>
-                    <span class="text-[10px] font-bold tracking-[3px] text-vp-gold uppercase">07</span>
-                    <h3 class="font-serif text-[19px] text-vp-deep mt-2 mb-3 leading-[1.3]">Cr&eacute;ditos a la Medida</h3>
-                    <p class="text-[14px] text-gray-500 leading-[1.8]">Estructuraci&oacute;n de cr&eacute;ditos a corto, mediano y largo plazo seg&uacute;n las necesidades del cliente.</p>
-                </div>
-                <!-- 8. Proyectos hoteleros / infra / inmobiliarios -->
-                <div class="reveal group bg-vp-smoke border border-gray-100 p-8 relative overflow-hidden transition-all duration-700 hover:border-vp-gold/30 hover:shadow-xl hover:shadow-vp-gold/5" style="transition-delay: 0.15s;">
-                    <div class="absolute top-0 left-0 right-0 h-[2px] bg-vp-gold scale-x-0 origin-left group-hover:scale-x-100 transition-transform duration-700"></div>
-                    <span class="text-[10px] font-bold tracking-[3px] text-vp-gold uppercase">08</span>
-                    <h3 class="font-serif text-[19px] text-vp-deep mt-2 mb-3 leading-[1.3]">Hoteles, Infraestructura e Inmobiliario</h3>
-                    <p class="text-[14px] text-gray-500 leading-[1.8]">Cr&eacute;ditos puente, construcci&oacute;n y largo plazo para proyectos hoteleros, de infraestructura e inmobiliarios.</p>
-                </div>
-            </div>
-
-            <!-- Caracter&iacute;sticas del Financiamiento (Plazo / Moneda / Destino / Fuentes) -->
-            <div class="mt-24 reveal">
-                <p class="text-center text-vp-gold text-[12px] font-bold uppercase tracking-[5px] mb-3">Caracter&iacute;sticas</p>
-                <h3 class="text-center font-serif text-3xl md:text-4xl text-vp-deep mb-12">Flexibilidad en la Estructura</h3>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-px bg-gray-100">
-                    <div class="bg-white p-8 group hover:bg-vp-smoke transition duration-700">
-                        <div class="w-10 h-10 mb-5 rounded-full bg-vp-mid/10 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-vp-mid" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-                        <p class="text-[10px] font-bold uppercase tracking-[2px] text-vp-gold mb-3">Plazo</p>
-                        <p class="text-[14px] text-gray-600 leading-[1.8]">Corto<br>Mediano<br>Largo</p>
-                    </div>
-                    <div class="bg-white p-8 group hover:bg-vp-smoke transition duration-700">
-                        <div class="w-10 h-10 mb-5 rounded-full bg-vp-mid/10 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-vp-mid" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-                        <p class="text-[10px] font-bold uppercase tracking-[2px] text-vp-gold mb-3">Moneda</p>
-                        <p class="text-[14px] text-gray-600 leading-[1.8]">Pesos<br>D&oacute;lares</p>
-                    </div>
-                    <div class="bg-white p-8 group hover:bg-vp-smoke transition duration-700">
-                        <div class="w-10 h-10 mb-5 rounded-full bg-vp-mid/10 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-vp-mid" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-                        </div>
-                        <p class="text-[10px] font-bold uppercase tracking-[2px] text-vp-gold mb-3">Destino</p>
-                        <p class="text-[14px] text-gray-600 leading-[1.8]">Capital de trabajo<br>Adquisici&oacute;n de activos<br>Importaci&oacute;n / Exportaci&oacute;n</p>
-                    </div>
-                    <div class="bg-white p-8 group hover:bg-vp-smoke transition duration-700">
-                        <div class="w-10 h-10 mb-5 rounded-full bg-vp-mid/10 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-vp-mid" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/></svg>
-                        </div>
-                        <p class="text-[10px] font-bold uppercase tracking-[2px] text-vp-gold mb-3">Fuentes de Fondeo</p>
-                        <p class="text-[14px] text-gray-600 leading-[1.8]">Variedad de instituciones financieras nacionales y extranjeras</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- SECTOR INMOBILIARIO (detalle del PDF) -->
-    <section id="inmobiliario" class="relative py-32 px-6 overflow-hidden" style="background: linear-gradient(180deg, #fafaf8 0%, #f8f5f0 100%);">
-        <div class="glow-orb w-[400px] h-[400px] bg-vp-mid/10 top-20 right-0"></div>
-        <div class="max-w-6xl mx-auto relative z-10">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-                <div class="lg:col-span-5">
-                    <p class="reveal text-vp-gold text-[12px] font-bold uppercase tracking-[5px] mb-5">Foco Sectorial</p>
-                    <h2 class="reveal font-serif text-4xl md:text-5xl text-vp-deep leading-[1.15] mb-8">
-                        Sector <em class="text-vp-mid">Inmobiliario</em>
-                    </h2>
-                    <div class="reveal w-12 h-[2px] bg-vp-gold mb-8"></div>
-                    <p class="reveal text-gray-600 text-[16px] leading-[1.9] mb-6">
-                        Estructuramos <strong class="text-vp-deep">cr&eacute;ditos puente</strong> a ser desembolsados en ministraciones por avance de obra para operaciones inmobiliarias.
-                    </p>
-                    <p class="reveal text-gray-600 text-[16px] leading-[1.9]">
-                        Tambi&eacute;n estructuramos cr&eacute;ditos de largo plazo dirigidos a hoteles, parques o naves industriales, y plazas comerciales estabilizadas con altos &iacute;ndices hist&oacute;ricos de ocupaci&oacute;n.
-                    </p>
-                </div>
-
-                <div class="lg:col-span-7 grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="reveal bg-white p-8 shadow-lg shadow-vp-mid/5 border-t-2 border-vp-gold">
-                        <p class="font-serif text-5xl text-vp-deep mb-2">20<span class="text-2xl text-gray-400">a</span></p>
-                        <p class="text-[11px] uppercase tracking-[2px] text-gray-500">A&ntilde;os de amortizaci&oacute;n</p>
-                    </div>
-                    <div class="reveal bg-white p-8 shadow-lg shadow-vp-mid/5 border-t-2 border-vp-gold" style="transition-delay: 0.1s;">
-                        <p class="font-serif text-5xl text-vp-deep mb-2">25<span class="text-2xl text-gray-400">a</span></p>
-                        <p class="text-[11px] uppercase tracking-[2px] text-gray-500">A&ntilde;os de amortizaci&oacute;n</p>
-                    </div>
-                    <div class="reveal bg-white p-8 shadow-lg shadow-vp-mid/5 border-t-2 border-vp-gold" style="transition-delay: 0.2s;">
-                        <p class="font-serif text-5xl text-vp-deep mb-2">30<span class="text-2xl text-gray-400">a</span></p>
-                        <p class="text-[11px] uppercase tracking-[2px] text-gray-500">A&ntilde;os de amortizaci&oacute;n</p>
-                    </div>
-                    <div class="reveal md:col-span-3 bg-vp-deep p-10 mt-2 relative overflow-hidden">
-                        <div class="absolute inset-0 opacity-[0.04]" style="background-image: linear-gradient(rgba(201,168,76,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.5) 1px, transparent 1px); background-size: 40px 40px;"></div>
-                        <p class="text-vp-gold text-[10px] font-bold uppercase tracking-[3px] mb-5">Tipolog&iacute;as Financiables</p>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div>
-                                <p class="text-white font-serif text-lg mb-2">Naves Industriales</p>
-                                <p class="text-gray-400 text-[13px] leading-[1.7]">Exclusivamente Clase A.</p>
-                            </div>
-                            <div>
-                                <p class="text-white font-serif text-lg mb-2">Plazas Comerciales</p>
-                                <p class="text-gray-400 text-[13px] leading-[1.7]">Fashion malls estabilizados.</p>
-                            </div>
-                            <div>
-                                <p class="text-white font-serif text-lg mb-2">Power Centers</p>
-                                <p class="text-gray-400 text-[13px] leading-[1.7]">Centros con anclas s&oacute;lidas y alto tr&aacute;fico.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- PARA QUI&Eacute;N (segmentaci&oacute;n estilo Apollo) -->
-    <section id="audiencias" class="relative py-32 px-6 bg-white overflow-hidden">
+    <!-- PROCESO DE EJECUCI&Oacute;N (estático, editorial, 5 pasos visibles) -->
+    <section id="proceso" class="relative bg-vp-smoke py-32 px-6">
         <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-16 max-w-3xl mx-auto">
-                <p class="reveal text-vp-gold text-[12px] font-bold uppercase tracking-[5px] mb-5">Para Qui&eacute;n</p>
-                <h2 class="reveal font-serif text-4xl md:text-5xl text-vp-deep mb-6 leading-[1.15]">Trabajamos con empresas <em class="text-vp-mid">l&iacute;deres</em></h2>
-                <div class="reveal flex items-center justify-center gap-4 text-vp-gold/60">
-                    <span class="w-12 h-px bg-vp-gold/30"></span>
-                    <span class="text-xs tracking-[6px]">&middot; &middot; &middot;</span>
-                    <span class="w-12 h-px bg-vp-gold/30"></span>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
+                <div class="lg:col-span-5">
+                    <p class="reveal text-vp-gold text-[10px] font-bold uppercase tracking-[4px] mb-5">Proceso de Ejecuci&oacute;n</p>
+                    <h2 class="reveal font-serif text-4xl md:text-5xl text-vp-deep leading-[1.15]">C&oacute;mo trabajamos.</h2>
+                </div>
+                <div class="lg:col-span-7 flex items-end">
+                    <p class="reveal text-gray-600 text-[16px] leading-[1.85] max-w-2xl">Buscamos las mejores condiciones de mercado para nuestros clientes, de forma profesional, estructurada y transparente. El proceso se desarrolla en cinco etapas claramente definidas.</p>
                 </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="reveal group relative bg-vp-smoke border border-gray-100 p-10 hover:border-vp-gold/30 hover:bg-white hover:shadow-2xl hover:shadow-vp-mid/5 transition-all duration-700">
-                    <p class="text-[10px] font-bold tracking-[3px] text-vp-gold uppercase mb-6">Sector Real</p>
-                    <h3 class="font-serif text-2xl text-vp-deep mb-5 leading-[1.25]">Empresas Grandes y Medianas</h3>
-                    <p class="text-[14px] text-gray-500 leading-[1.9] mb-8">Corporativos con necesidad de capital de trabajo, expansi&oacute;n, adquisiciones, refinanciamiento de pasivos o cr&eacute;ditos sindicados.</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="text-[10px] uppercase tracking-[2px] text-vp-mid border border-vp-mid/20 px-2.5 py-1">Industrial</span>
-                        <span class="text-[10px] uppercase tracking-[2px] text-vp-mid border border-vp-mid/20 px-2.5 py-1">Agroalimentario</span>
-                        <span class="text-[10px] uppercase tracking-[2px] text-vp-mid border border-vp-mid/20 px-2.5 py-1">Hotelero</span>
+
+            <ol class="border-t border-vp-deep/10">
+                <li class="reveal grid grid-cols-12 gap-8 py-10 border-b border-vp-deep/10 group">
+                    <div class="col-span-12 md:col-span-1 font-serif text-2xl text-vp-gold">01</div>
+                    <div class="col-span-12 md:col-span-3">
+                        <h3 class="font-serif text-2xl text-vp-deep leading-[1.2]">Debida Diligencia</h3>
+                        <p class="text-[11px] uppercase tracking-[2px] text-gray-400 mt-2">Due Diligence</p>
                     </div>
+                    <div class="col-span-12 md:col-span-8">
+                        <p class="text-gray-600 text-[15px] leading-[1.85]">An&aacute;lisis del negocio y estructuraci&oacute;n: dise&ntilde;amos el financiamiento m&aacute;s adecuado para cada caso. Identificamos riesgos, supuestos y palancas de valor que ser&aacute;n el insumo del Memorando.</p>
+                    </div>
+                </li>
+                <li class="reveal grid grid-cols-12 gap-8 py-10 border-b border-vp-deep/10 group">
+                    <div class="col-span-12 md:col-span-1 font-serif text-2xl text-vp-gold">02</div>
+                    <div class="col-span-12 md:col-span-3">
+                        <h3 class="font-serif text-2xl text-vp-deep leading-[1.2]">Memorando Informativo</h3>
+                        <p class="text-[11px] uppercase tracking-[2px] text-gray-400 mt-2">Information Memo</p>
+                    </div>
+                    <div class="col-span-12 md:col-span-8">
+                        <p class="text-gray-600 text-[15px] leading-[1.85]">Elaboramos el Memorando con la informaci&oacute;n cualitativa y cuantitativa m&aacute;s relevante para presentar la transacci&oacute;n ante distintas fuentes de financiamiento, en el formato que el mercado espera.</p>
+                    </div>
+                </li>
+                <li class="reveal grid grid-cols-12 gap-8 py-10 border-b border-vp-deep/10 group">
+                    <div class="col-span-12 md:col-span-1 font-serif text-2xl text-vp-gold">03</div>
+                    <div class="col-span-12 md:col-span-3">
+                        <h3 class="font-serif text-2xl text-vp-deep leading-[1.2]">Acceso al Mercado</h3>
+                        <p class="text-[11px] uppercase tracking-[2px] text-gray-400 mt-2">Market Access</p>
+                    </div>
+                    <div class="col-span-12 md:col-span-8">
+                        <p class="text-gray-600 text-[15px] leading-[1.85]">Coordinamos el acercamiento, seguimiento y gesti&oacute;n con los distintos jugadores del mercado &mdash;bancos, fondos de deuda, fondos de capital, sofomes&mdash; en todas las etapas del proceso.</p>
+                    </div>
+                </li>
+                <li class="reveal grid grid-cols-12 gap-8 py-10 border-b border-vp-deep/10 group">
+                    <div class="col-span-12 md:col-span-1 font-serif text-2xl text-vp-gold">04</div>
+                    <div class="col-span-12 md:col-span-3">
+                        <h3 class="font-serif text-2xl text-vp-deep leading-[1.2]">Obtenci&oacute;n de Propuestas</h3>
+                        <p class="text-[11px] uppercase tracking-[2px] text-gray-400 mt-2">Term Sheets</p>
+                    </div>
+                    <div class="col-span-12 md:col-span-8">
+                        <p class="text-gray-600 text-[15px] leading-[1.85]">Obtenci&oacute;n y negociaci&oacute;n de Cartas de T&eacute;rminos y Condiciones Preliminares por parte de una o m&aacute;s fuentes de financiamiento, comparables entre s&iacute; para informar la decisi&oacute;n del cliente.</p>
+                    </div>
+                </li>
+                <li class="reveal grid grid-cols-12 gap-8 py-10 border-b border-vp-deep/10 group">
+                    <div class="col-span-12 md:col-span-1 font-serif text-2xl text-vp-gold">05</div>
+                    <div class="col-span-12 md:col-span-3">
+                        <h3 class="font-serif text-2xl text-vp-deep leading-[1.2]">Cierre y Disposici&oacute;n</h3>
+                        <p class="text-[11px] uppercase tracking-[2px] text-gray-400 mt-2">Closing</p>
+                    </div>
+                    <div class="col-span-12 md:col-span-8">
+                        <p class="text-gray-600 text-[15px] leading-[1.85]">Supervisamos el proceso legal, documental y operativo hasta el cierre efectivo de la transacci&oacute;n y la disposici&oacute;n de los recursos financieros.</p>
+                    </div>
+                </li>
+            </ol>
+
+            <!-- Cierre editorial: Honorario de &eacute;xito -->
+            <div class="reveal mt-16 grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+                <div class="md:col-span-3">
+                    <p class="text-[10px] uppercase tracking-[4px] text-vp-gold font-bold">Honorarios</p>
                 </div>
-                <div class="reveal group relative bg-vp-smoke border border-gray-100 p-10 hover:border-vp-gold/30 hover:bg-white hover:shadow-2xl hover:shadow-vp-mid/5 transition-all duration-700" style="transition-delay: 0.1s;">
-                    <p class="text-[10px] font-bold tracking-[3px] text-vp-gold uppercase mb-6">Desarrolladores</p>
-                    <h3 class="font-serif text-2xl text-vp-deep mb-5 leading-[1.25]">Inmobiliarios e Infraestructura</h3>
-                    <p class="text-[14px] text-gray-500 leading-[1.9] mb-8">Desarrolladores de naves industriales, hoteles, plazas comerciales y power centers con proyectos de mediano a largo plazo.</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="text-[10px] uppercase tracking-[2px] text-vp-mid border border-vp-mid/20 px-2.5 py-1">Cr&eacute;dito Puente</span>
-                        <span class="text-[10px] uppercase tracking-[2px] text-vp-mid border border-vp-mid/20 px-2.5 py-1">20-30 a&ntilde;os</span>
-                        <span class="text-[10px] uppercase tracking-[2px] text-vp-mid border border-vp-mid/20 px-2.5 py-1">Clase A</span>
-                    </div>
-                </div>
-                <div class="reveal group relative bg-vp-smoke border border-gray-100 p-10 hover:border-vp-gold/30 hover:bg-white hover:shadow-2xl hover:shadow-vp-mid/5 transition-all duration-700" style="transition-delay: 0.2s;">
-                    <p class="text-[10px] font-bold tracking-[3px] text-vp-gold uppercase mb-6">Entidades Financieras</p>
-                    <h3 class="font-serif text-2xl text-vp-deep mb-5 leading-[1.25]">Sofomes y Arrendadoras</h3>
-                    <p class="text-[14px] text-gray-500 leading-[1.9] mb-8">Estructuraci&oacute;n de l&iacute;neas revolventes, bursatilizaci&oacute;n de cartera, base de endeudamiento y otros esquemas espec&iacute;ficos del sector.</p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="text-[10px] uppercase tracking-[2px] text-vp-mid border border-vp-mid/20 px-2.5 py-1">Revolventes</span>
-                        <span class="text-[10px] uppercase tracking-[2px] text-vp-mid border border-vp-mid/20 px-2.5 py-1">Reportos</span>
-                        <span class="text-[10px] uppercase tracking-[2px] text-vp-mid border border-vp-mid/20 px-2.5 py-1">Pre-exportaci&oacute;n</span>
-                    </div>
+                <div class="md:col-span-9">
+                    <p class="font-serif text-2xl md:text-3xl text-vp-deep leading-[1.35]">Cobramos un <em class="text-vp-mid">honorario de &eacute;xito</em> &mdash;un porcentaje del monto financiero obtenido&mdash; acordado por escrito en una carta mandato antes de iniciar el proceso.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- PROPUESTA DE VALOR (&iquest;Por qu&eacute; ValPer?) -->
-    <section id="valor" class="relative py-32 px-6 overflow-hidden" style="background: linear-gradient(180deg, #fafaf8 0%, #f8f5f0 100%);">
-        <div class="glow-orb w-[500px] h-[500px] bg-vp-gold/10 -top-40 -right-40"></div>
-        <div class="max-w-6xl mx-auto relative z-10">
-            <div class="text-center mb-20 max-w-3xl mx-auto">
-                <p class="reveal text-vp-gold text-[12px] font-bold uppercase tracking-[5px] mb-5">&iquest;Por qu&eacute; ValPer?</p>
-                <h2 class="reveal font-serif text-4xl md:text-5xl text-vp-deep mb-6">Nuestra Propuesta de Valor</h2>
-                <p class="reveal text-gray-500 text-[16px] leading-[1.9]">Cinco razones que hacen la diferencia en cada operaci&oacute;n que estructuramos.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-gray-100">
-                <div class="reveal bg-white p-10 group hover:bg-vp-smoke transition duration-700">
-                    <div class="flex items-start gap-5">
-                        <span class="font-serif text-4xl text-vp-gold/40 group-hover:text-vp-gold transition duration-700 leading-none">01</span>
-                        <div>
-                            <h3 class="font-serif text-xl text-vp-deep mb-3">Entendimiento profundo del negocio</h3>
-                            <p class="text-[15px] text-gray-500 leading-[1.9]">Conocemos las necesidades del cliente, lo que se traduce en una alta capacidad de estructuraci&oacute;n y ejecuci&oacute;n de soluciones financieras efectivas.</p>
-                        </div>
-                    </div>
+    <!-- PRODUCTOS (rueda + 3 familias editoriales) -->
+    <section id="productos" class="relative py-32 px-6 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
+                <div class="lg:col-span-5">
+                    <p class="reveal text-vp-gold text-[10px] font-bold uppercase tracking-[4px] mb-5">Soluciones</p>
+                    <h2 class="reveal font-serif text-4xl md:text-5xl text-vp-deep leading-[1.15]">Tres pr&aacute;cticas, ocho instrumentos.</h2>
                 </div>
-                <div class="reveal bg-white p-10 group hover:bg-vp-smoke transition duration-700" style="transition-delay: 0.05s;">
-                    <div class="flex items-start gap-5">
-                        <span class="font-serif text-4xl text-vp-gold/40 group-hover:text-vp-gold transition duration-700 leading-none">02</span>
-                        <div>
-                            <h3 class="font-serif text-xl text-vp-deep mb-3">Amplia red de fuentes de fondeo</h3>
-                            <p class="text-[15px] text-gray-500 leading-[1.9]">Acceso a una red robusta de deuda y capital, lo que permite ofrecer t&eacute;rminos y condiciones alineados al perfil, objetivos y necesidades de cada cliente.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="reveal bg-white p-10 group hover:bg-vp-smoke transition duration-700" style="transition-delay: 0.1s;">
-                    <div class="flex items-start gap-5">
-                        <span class="font-serif text-4xl text-vp-gold/40 group-hover:text-vp-gold transition duration-700 leading-none">03</span>
-                        <div>
-                            <h3 class="font-serif text-xl text-vp-deep mb-3">Conocemos el mercado</h3>
-                            <p class="text-[15px] text-gray-500 leading-[1.9]">Sabemos identificar la fuente de recursos m&aacute;s adecuada para cada caso, maximizando la probabilidad de &eacute;xito en la obtenci&oacute;n del capital o deuda.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="reveal bg-white p-10 group hover:bg-vp-smoke transition duration-700" style="transition-delay: 0.15s;">
-                    <div class="flex items-start gap-5">
-                        <span class="font-serif text-4xl text-vp-gold/40 group-hover:text-vp-gold transition duration-700 leading-none">04</span>
-                        <div>
-                            <h3 class="font-serif text-xl text-vp-deep mb-3">Servicio personalizado y directo</h3>
-                            <p class="text-[15px] text-gray-500 leading-[1.9]">Ahorramos tiempo a nuestros clientes y evitamos desgaste en todo el proceso de obtenci&oacute;n de recursos financieros.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="reveal bg-white p-10 group hover:bg-vp-smoke transition duration-700 md:col-span-2" style="transition-delay: 0.2s;">
-                    <div class="flex items-start gap-5">
-                        <span class="font-serif text-4xl text-vp-gold/40 group-hover:text-vp-gold transition duration-700 leading-none">05</span>
-                        <div>
-                            <h3 class="font-serif text-xl text-vp-deep mb-3">Asesor&iacute;a desde el inicio</h3>
-                            <p class="text-[15px] text-gray-500 leading-[1.9]">Si una empresa a&uacute;n no re&uacute;ne las condiciones necesarias para acceder a capital o deuda, la acompa&ntilde;amos se&ntilde;alando los ajustes clave que debe implementar para hacerlo viable a futuro.</p>
-                        </div>
-                    </div>
+                <div class="lg:col-span-7 flex items-end">
+                    <p class="reveal text-gray-600 text-[16px] leading-[1.85] max-w-2xl">Estructuramos financiamiento de deuda y capital agrupando nuestras capacidades en tres pr&aacute;cticas: <em class="text-vp-deep not-italic">deuda corporativa</em>, <em class="text-vp-deep not-italic">capital de trabajo</em> y <em class="text-vp-deep not-italic">activos productivos</em>.</p>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- COMENCEMOS: Honorario de &Eacute;xito + Requisitos de Informaci&oacute;n -->
-    <section id="comencemos" class="relative py-32 px-6 bg-vp-cream overflow-hidden">
-        <div class="glow-orb w-[500px] h-[500px] bg-vp-gold/10 bottom-0 -left-40"></div>
-        <div class="max-w-6xl mx-auto relative z-10">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <!-- Honorario de &Eacute;xito -->
-                <div class="reveal-left bg-white shadow-xl shadow-vp-mid/5 p-10 lg:p-12 relative">
+            <!-- Diagrama de productos (rueda del PDF, estilo card sec 2) -->
+            <div class="reveal mb-24 max-w-4xl mx-auto">
+                <div class="bg-white shadow-xl shadow-vp-mid/5 border border-gray-100 relative p-10 md:p-16">
                     <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-vp-gold via-vp-mid to-vp-gold"></div>
-                    <p class="text-vp-gold text-[12px] font-bold uppercase tracking-[5px] mb-5">Modelo de Honorarios</p>
-                    <h3 class="font-serif text-3xl md:text-4xl text-vp-deep mb-8 leading-[1.2]">Honorario de &Eacute;xito</h3>
-                    <div class="w-12 h-[2px] bg-vp-gold mb-8"></div>
-                    <p class="text-gray-600 text-[16px] leading-[1.9] mb-6">
-                        El Honorario de &Eacute;xito corresponde a un <strong class="text-vp-deep">porcentaje del monto de los recursos financieros obtenidos</strong> para el cliente.
-                    </p>
-                    <p class="text-gray-600 text-[15px] leading-[1.9] mb-6">Este porcentaje se determina con base en:</p>
-                    <ul class="space-y-3 mb-8">
-                        <li class="flex items-start gap-3 text-[15px] text-gray-600"><span class="w-1.5 h-1.5 mt-2 rounded-full bg-vp-gold flex-shrink-0"></span>Monto y plazo del financiamiento</li>
-                        <li class="flex items-start gap-3 text-[15px] text-gray-600"><span class="w-1.5 h-1.5 mt-2 rounded-full bg-vp-gold flex-shrink-0"></span>Perfil financiero del cliente</li>
-                        <li class="flex items-start gap-3 text-[15px] text-gray-600"><span class="w-1.5 h-1.5 mt-2 rounded-full bg-vp-gold flex-shrink-0"></span>Complejidad estructural y legal de la operaci&oacute;n</li>
-                    </ul>
-                    <div class="border-t border-gray-100 pt-6">
-                        <p class="text-[13px] text-gray-500 leading-[1.9]"><em class="text-vp-deep not-italic font-bold">Carta mandato:</em> el porcentaje correspondiente se acuerda por escrito y se formaliza antes de iniciar el proceso.</p>
+                    <p class="text-center text-vp-gold text-[10px] font-bold uppercase tracking-[4px] mb-2">Esquemas Diferenciados</p>
+                    <p class="text-center font-serif text-2xl md:text-3xl text-vp-deep leading-[1.3] max-w-xl mx-auto mb-12">En nuestras soluciones manejamos los siguientes esquemas para la <em class="text-vp-mid">obtenci&oacute;n de recursos</em>.</p>
+
+                    <div class="relative mx-auto" style="max-width: 620px;">
+                        <svg viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
+                            <!-- Anillos sutiles -->
+                            <circle cx="400" cy="400" r="265" fill="none" stroke="#1a1433" stroke-opacity="0.05" stroke-width="1" stroke-dasharray="2 6"/>
+                            <circle cx="400" cy="400" r="175" fill="none" stroke="#c9a84c" stroke-opacity="0.25" stroke-width="0.75"/>
+
+                            <!-- L&iacute;neas hacia cada producto -->
+                            <g stroke="#1a1433" stroke-opacity="0.1" stroke-width="0.75">
+                                <line x1="400" y1="225" x2="400" y2="135"/>
+                                <line x1="524" y1="276" x2="588" y2="212"/>
+                                <line x1="575" y1="400" x2="665" y2="400"/>
+                                <line x1="524" y1="524" x2="588" y2="588"/>
+                                <line x1="400" y1="575" x2="400" y2="665"/>
+                                <line x1="276" y1="524" x2="212" y2="588"/>
+                                <line x1="225" y1="400" x2="135" y2="400"/>
+                                <line x1="276" y1="276" x2="212" y2="212"/>
+                            </g>
+
+                            <!-- Puntos dorados -->
+                            <g fill="#c9a84c">
+                                <circle cx="400" cy="225" r="5"/>
+                                <circle cx="524" cy="276" r="5"/>
+                                <circle cx="575" cy="400" r="5"/>
+                                <circle cx="524" cy="524" r="5"/>
+                                <circle cx="400" cy="575" r="5"/>
+                                <circle cx="276" cy="524" r="5"/>
+                                <circle cx="225" cy="400" r="5"/>
+                                <circle cx="276" cy="276" r="5"/>
+                            </g>
+
+                            <!-- Centro: c&iacute;rculo deep con tipo serif italic -->
+                            <circle cx="400" cy="400" r="115" fill="#1a1433"/>
+                            <text x="400" y="392" text-anchor="middle" font-family="Playfair Display, serif" font-size="34" fill="#ffffff" font-style="italic">Productos</text>
+                            <line x1="375" y1="408" x2="425" y2="408" stroke="#c9a84c" stroke-width="0.75"/>
+                            <text x="400" y="430" text-anchor="middle" font-family="PT Sans, sans-serif" font-size="9" fill="#c9a84c" letter-spacing="4">VALPER</text>
+
+                            <!-- Labels - Playfair para nombres -->
+                            <text x="400" y="115" text-anchor="middle" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Cr&#233;ditos Sindicados</text>
+                            <text x="610" y="200" text-anchor="start" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Arrendamiento S&amp;LB</text>
+                            <text x="688" y="396" text-anchor="start" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Asset-Based</text>
+                            <text x="688" y="416" text-anchor="start" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Lending</text>
+                            <text x="610" y="605" text-anchor="start" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Factoraje</text>
+                            <text x="610" y="625" text-anchor="start" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Clientes / Proveedores</text>
+                            <text x="400" y="700" text-anchor="middle" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Factoraje Internacional</text>
+                            <text x="190" y="605" text-anchor="end" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Refinanciamiento</text>
+                            <text x="190" y="625" text-anchor="end" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">de Deuda</text>
+                            <text x="112" y="396" text-anchor="end" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Cr&#233;ditos</text>
+                            <text x="112" y="416" text-anchor="end" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">a la Medida</text>
+                            <text x="190" y="200" text-anchor="end" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Hoteles, Infraestructura</text>
+                            <text x="190" y="220" text-anchor="end" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">e Inmobiliario</text>
+                        </svg>
                     </div>
                 </div>
+            </div>
 
-                <!-- Requisitos de Informaci&oacute;n -->
-                <div class="reveal-right bg-vp-deep shadow-xl p-10 lg:p-12 relative overflow-hidden">
-                    <div class="absolute inset-0 opacity-[0.04]" style="background-image: linear-gradient(rgba(201,168,76,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.5) 1px, transparent 1px); background-size: 40px 40px;"></div>
-                    <div class="relative z-10">
-                        <p class="text-vp-gold text-[12px] font-bold uppercase tracking-[5px] mb-5">Para empezar</p>
-                        <h3 class="font-serif text-3xl md:text-4xl text-white mb-8 leading-[1.2]">Requisitos de Informaci&oacute;n</h3>
-                        <div class="w-12 h-[2px] bg-vp-gold mb-8"></div>
-                        <p class="text-gray-400 text-[15px] leading-[1.9] mb-8">Para iniciar el an&aacute;lisis de viabilidad de su necesidad financiera necesitamos:</p>
-                        <ul class="space-y-4 mb-8">
-                            <li class="flex items-start gap-3 text-[14px] text-gray-300"><span class="text-vp-gold font-bold text-xs mt-1">01</span><span>Monto requerido de financiamiento</span></li>
-                            <li class="flex items-start gap-3 text-[14px] text-gray-300"><span class="text-vp-gold font-bold text-xs mt-1">02</span><span>Estados financieros auditados (o internos) de los cierres de <strong class="text-white">2021&ndash;2025</strong> y los internos m&aacute;s recientes del <strong class="text-white">2026</strong></span></li>
-                            <li class="flex items-start gap-3 text-[14px] text-gray-300"><span class="text-vp-gold font-bold text-xs mt-1">03</span><span>Presentaci&oacute;n ejecutiva de la empresa (si cuenta con ella)</span></li>
-                        </ul>
-                        <div class="border border-vp-gold/20 p-5 bg-vp-gold/[0.03]">
-                            <p class="text-vp-gold text-[10px] font-bold uppercase tracking-[2px] mb-3">Adicional para hoteles</p>
-                            <ul class="space-y-2 text-[13px] text-gray-400 leading-[1.7]">
-                                <li class="flex items-start gap-2"><span class="w-1 h-1 mt-2 rounded-full bg-vp-gold flex-shrink-0"></span>&Uacute;ltimo aval&uacute;o realizado</li>
-                                <li class="flex items-start gap-2"><span class="w-1 h-1 mt-2 rounded-full bg-vp-gold flex-shrink-0"></span>NOI anual de los &uacute;ltimos 5 a&ntilde;os (reporte FRONT)</li>
-                                <li class="flex items-start gap-2"><span class="w-1 h-1 mt-2 rounded-full bg-vp-gold flex-shrink-0"></span>Trend report de STR de los &uacute;ltimos 5 a&ntilde;os</li>
-                            </ul>
+            <!-- Caracter&iacute;sticas (l&iacute;nea editorial sobria) -->
+            <div class="reveal grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                <div class="lg:col-span-3">
+                    <p class="text-[10px] uppercase tracking-[4px] text-vp-gold font-bold mb-3">Caracter&iacute;sticas</p>
+                    <h3 class="font-serif text-2xl text-vp-deep leading-tight">Estructura flexible.</h3>
+                </div>
+                <div class="lg:col-span-9 grid grid-cols-2 md:grid-cols-4 gap-px bg-vp-deep/10 border border-vp-deep/10">
+                    <div class="bg-white p-6">
+                        <p class="text-[10px] uppercase tracking-[2px] text-gray-400 mb-2">Plazo</p>
+                        <p class="text-[14px] text-vp-deep leading-[1.7]">Corto<br>Mediano<br>Largo</p>
+                    </div>
+                    <div class="bg-white p-6">
+                        <p class="text-[10px] uppercase tracking-[2px] text-gray-400 mb-2">Moneda</p>
+                        <p class="text-[14px] text-vp-deep leading-[1.7]">MXN<br>USD</p>
+                    </div>
+                    <div class="bg-white p-6">
+                        <p class="text-[10px] uppercase tracking-[2px] text-gray-400 mb-2">Destino</p>
+                        <p class="text-[14px] text-vp-deep leading-[1.7]">Capital de trabajo<br>Adquisici&oacute;n de activos<br>Importaci&oacute;n / Exportaci&oacute;n</p>
+                    </div>
+                    <div class="bg-white p-6">
+                        <p class="text-[10px] uppercase tracking-[2px] text-gray-400 mb-2">Fuentes</p>
+                        <p class="text-[14px] text-vp-deep leading-[1.7]">Instituciones financieras nacionales y extranjeras</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTOR INMOBILIARIO -->
+    <section id="inmobiliario" class="relative py-32 px-6 bg-vp-cream">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16">
+                <div class="lg:col-span-5">
+                    <p class="reveal text-vp-gold text-[10px] font-bold uppercase tracking-[4px] mb-5">Foco Sectorial</p>
+                    <h2 class="reveal font-serif text-4xl md:text-5xl text-vp-deep leading-[1.15]">Sector <em class="text-vp-mid">Inmobiliario</em>.</h2>
+                </div>
+                <div class="lg:col-span-7 flex items-end">
+                    <p class="reveal text-gray-600 text-[16px] leading-[1.85] max-w-2xl">Estructuramos <strong class="text-vp-deep">cr&eacute;ditos puente</strong> desembolsados en ministraciones por avance de obra, as&iacute; como <strong class="text-vp-deep">cr&eacute;ditos de largo plazo</strong> para activos estabilizados con altos &iacute;ndices hist&oacute;ricos de ocupaci&oacute;n.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                <!-- Plazos -->
+                <div class="reveal lg:col-span-5">
+                    <p class="text-[10px] uppercase tracking-[4px] text-vp-gold font-bold mb-6">Esquemas de amortizaci&oacute;n a largo plazo</p>
+                    <div class="flex items-end gap-8 font-serif">
+                        <div>
+                            <span class="text-5xl text-vp-deep block">20</span>
+                            <span class="text-[10px] uppercase tracking-[2px] text-gray-400 mt-1 block">a&ntilde;os</span>
+                        </div>
+                        <span class="text-vp-gold/40 text-2xl pb-2">/</span>
+                        <div>
+                            <span class="text-5xl text-vp-deep block">25</span>
+                            <span class="text-[10px] uppercase tracking-[2px] text-gray-400 mt-1 block">a&ntilde;os</span>
+                        </div>
+                        <span class="text-vp-gold/40 text-2xl pb-2">/</span>
+                        <div>
+                            <span class="text-5xl text-vp-deep block">30</span>
+                            <span class="text-[10px] uppercase tracking-[2px] text-gray-400 mt-1 block">a&ntilde;os</span>
+                        </div>
+                    </div>
+                    <p class="text-[14px] text-gray-500 leading-[1.85] mt-8 max-w-md">Para hoteles, parques o naves industriales y plazas comerciales estabilizadas con tracci&oacute;n hist&oacute;rica.</p>
+                </div>
+
+                <!-- Tipolog&iacute;as -->
+                <div class="reveal lg:col-span-7">
+                    <p class="text-[10px] uppercase tracking-[4px] text-vp-gold font-bold mb-6">Tipolog&iacute;as financiables</p>
+                    <div class="border-t border-vp-deep/10">
+                        <div class="grid grid-cols-12 gap-4 py-5 border-b border-vp-deep/10">
+                            <div class="col-span-4 font-serif text-vp-deep text-lg">Naves Industriales</div>
+                            <div class="col-span-8 text-gray-600 text-[14px] leading-[1.8]">Exclusivamente Clase A.</div>
+                        </div>
+                        <div class="grid grid-cols-12 gap-4 py-5 border-b border-vp-deep/10">
+                            <div class="col-span-4 font-serif text-vp-deep text-lg">Plazas Comerciales</div>
+                            <div class="col-span-8 text-gray-600 text-[14px] leading-[1.8]">Fashion malls estabilizados con &iacute;ndices hist&oacute;ricos de ocupaci&oacute;n.</div>
+                        </div>
+                        <div class="grid grid-cols-12 gap-4 py-5 border-b border-vp-deep/10">
+                            <div class="col-span-4 font-serif text-vp-deep text-lg">Power Centers</div>
+                            <div class="col-span-8 text-gray-600 text-[14px] leading-[1.8]">Centros con anclas s&oacute;lidas y alto tr&aacute;fico.</div>
+                        </div>
+                        <div class="grid grid-cols-12 gap-4 py-5 border-b border-vp-deep/10">
+                            <div class="col-span-4 font-serif text-vp-deep text-lg">Hoteles</div>
+                            <div class="col-span-8 text-gray-600 text-[14px] leading-[1.8]">Requiere &uacute;ltimo aval&uacute;o, NOI 5 a&ntilde;os (FRONT) y Trend Report STR.</div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- PROPUESTA DE VALOR (compacta, editorial) -->
+    <section id="valor" class="relative py-32 px-6 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16">
+                <div class="lg:col-span-5">
+                    <p class="reveal text-vp-gold text-[10px] font-bold uppercase tracking-[4px] mb-5">Por qu&eacute; ValPer</p>
+                    <h2 class="reveal font-serif text-4xl md:text-5xl text-vp-deep leading-[1.15]">Una mesa con red, criterio y oficio.</h2>
+                </div>
+                <div class="lg:col-span-7 flex items-end">
+                    <p class="reveal text-gray-600 text-[16px] leading-[1.85] max-w-2xl">Donde otros venden producto, nosotros estructuramos. Nuestra propuesta combina conocimiento profundo del negocio del cliente, acceso institucional a fuentes de fondeo y un proceso que respeta el tiempo del CFO.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-vp-deep/10 border border-vp-deep/10">
+                <div class="reveal bg-white p-8">
+                    <p class="font-serif text-3xl text-vp-gold mb-4">01</p>
+                    <h3 class="font-serif text-xl text-vp-deep mb-3 leading-[1.25]">Entendemos el negocio.</h3>
+                    <p class="text-[14px] text-gray-600 leading-[1.85]">Antes de estructurar, escuchamos. El Due Diligence no es un check-list: es la base de una soluci&oacute;n a la medida.</p>
+                </div>
+                <div class="reveal bg-white p-8" style="transition-delay: 0.05s;">
+                    <p class="font-serif text-3xl text-vp-gold mb-4">02</p>
+                    <h3 class="font-serif text-xl text-vp-deep mb-3 leading-[1.25]">Red institucional amplia.</h3>
+                    <p class="text-[14px] text-gray-600 leading-[1.85]">Acceso a deuda y capital en M&eacute;xico y en el extranjero. Las condiciones que conseguimos reflejan el perfil real del cliente, no el del producto disponible.</p>
+                </div>
+                <div class="reveal bg-white p-8" style="transition-delay: 0.1s;">
+                    <p class="font-serif text-3xl text-vp-gold mb-4">03</p>
+                    <h3 class="font-serif text-xl text-vp-deep mb-3 leading-[1.25]">Servicio directo de socio.</h3>
+                    <p class="text-[14px] text-gray-600 leading-[1.85]">El cliente trata directamente con un socio responsable de la operaci&oacute;n. Sin intermediarios, sin ruido, sin desgaste innecesario.</p>
+                </div>
+            </div>
+
+            <p class="reveal mt-10 text-[14px] text-gray-500 leading-[1.85] max-w-2xl">Si la empresa a&uacute;n no re&uacute;ne las condiciones necesarias para acceder a capital o deuda, la asesoramos desde el inicio se&ntilde;alando los ajustes clave para hacerlo viable a futuro.</p>
         </div>
     </section>
 
     <!-- MISION / VISION / VALORES -->
     <section class="relative py-32 px-6 overflow-hidden" style="background: radial-gradient(ellipse at 30% 50%, #2c2345, #1a1433 60%, #0f0c18);">
-        <div class="glow-orb w-[600px] h-[600px] bg-vp-gold/10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
         <div class="absolute inset-0 opacity-[0.03]" style="background-image: linear-gradient(rgba(201,168,76,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.4) 1px, transparent 1px); background-size: 60px 60px;"></div>
 
         <div class="relative z-10 max-w-5xl mx-auto text-center">
@@ -827,143 +580,131 @@
         </div>
     </section>
 
-    <!-- NOSOTROS (4 SOCIOS del PDF) -->
-    <section id="nosotros" class="relative py-32 px-6 bg-vp-cream overflow-hidden">
+    <!-- NOSOTROS (4 Socios — editorial, slots para fotos) -->
+    <section id="nosotros" class="relative py-32 px-6 bg-white">
         <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-20 max-w-3xl mx-auto">
-                <p class="reveal text-vp-gold text-[12px] font-bold uppercase tracking-[5px] mb-5">Liderazgo</p>
-                <h2 class="reveal font-serif text-4xl md:text-5xl text-vp-deep mb-6">Nuestros Socios</h2>
-                <p class="reveal text-gray-500 text-[16px] leading-[1.9]">M&aacute;s de 50 a&ntilde;os de experiencia combinada en banca corporativa, banca de inversi&oacute;n y direcci&oacute;n general.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
+                <div class="lg:col-span-5">
+                    <p class="reveal text-vp-gold text-[10px] font-bold uppercase tracking-[4px] mb-5">Socios</p>
+                    <h2 class="reveal font-serif text-4xl md:text-5xl text-vp-deep leading-[1.15]">Cuatro socios. <em class="text-vp-mid">Una mesa.</em></h2>
+                </div>
+                <div class="lg:col-span-7 flex items-end">
+                    <p class="reveal text-gray-600 text-[16px] leading-[1.85] max-w-2xl">M&aacute;s de 50 a&ntilde;os combinados en banca corporativa, banca de inversi&oacute;n y direcci&oacute;n general. Trayectorias en HSBC, Rabobank, American Express Bank, Banco Finterra y la CNBV.</p>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div class="border-t border-vp-deep/10">
 
                 <!-- Socio 1: Jos&eacute; Antonio P&eacute;rez -->
-                <article class="reveal group bg-white shadow-xl shadow-vp-mid/5 overflow-hidden">
-                    <div class="bg-vp-deep p-8 relative overflow-hidden">
-                        <div class="absolute inset-0 opacity-[0.06]" style="background-image: linear-gradient(rgba(201,168,76,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.5) 1px, transparent 1px); background-size: 40px 40px;"></div>
-                        <div class="relative z-10 flex items-end justify-between">
-                            <div>
-                                <h3 class="font-serif text-3xl text-white mb-1">Jos&eacute; Antonio P&eacute;rez</h3>
-                                <p class="text-vp-gold text-[11px] font-bold uppercase tracking-[3px]">Socio Fundador</p>
-                            </div>
-                            <p class="font-serif text-vp-gold-light text-5xl opacity-70">JAP</p>
+                <article class="reveal grid grid-cols-1 lg:grid-cols-12 gap-8 py-14 border-b border-vp-deep/10">
+                    <div class="lg:col-span-3">
+                        <div class="aspect-[4/5] bg-vp-smoke border border-vp-deep/10 overflow-hidden">
+                            <img src="https://www.valper.mx/img/team/team2_1.jpg" alt="Jos&eacute; Antonio P&eacute;rez - Socio Fundador de ValPer" class="w-full h-full object-cover object-top grayscale hover:grayscale-0 transition duration-700"
+                                 onerror="this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center relative\'><span class=\'font-serif text-7xl text-vp-deep/15\'>JAP</span><span class=\'absolute bottom-3 left-3 text-[9px] uppercase tracking-[2px] text-gray-400\'>Foto pendiente</span></div>';">
                         </div>
                     </div>
-                    <div class="p-8">
-                        <p class="text-vp-deep font-bold text-[12px] uppercase tracking-[2px] mb-4">Trayectoria</p>
-                        <ul class="space-y-2 text-[14px] text-gray-600 leading-[1.7] mb-6">
-                            <li><strong class="text-vp-deep">Socio</strong> &ndash; ValPer</li>
-                            <li><strong class="text-vp-deep">Director Comercial</strong> &ndash; SQN Latina (arrendadora)</li>
-                            <li><strong class="text-vp-deep">Director Comercial</strong> &ndash; Bankaool (banco)</li>
-                            <li><strong class="text-vp-deep">Director Comercial</strong> &ndash; Agrofinanzas (sofom)</li>
-                            <li><strong class="text-vp-deep">VP Banca Corporativa</strong> &ndash; Rabobank International</li>
-                            <li><strong class="text-vp-deep">Dir. Finanzas y Tesorer&iacute;a</strong> &ndash; Agroindustrias Unidas (ECOMGroup)</li>
-                            <li><strong class="text-vp-deep">MBA</strong> &ndash; Kent Business School (University of Kent)</li>
+                    <div class="lg:col-span-4">
+                        <p class="text-[10px] uppercase tracking-[4px] text-vp-gold font-bold mb-3">Socio Fundador</p>
+                        <h3 class="font-serif text-3xl text-vp-deep mb-4 leading-[1.1]">Jos&eacute; Antonio P&eacute;rez</h3>
+                        <p class="text-[14px] text-gray-600 leading-[1.85]">+25 a&ntilde;os en el sector financiero. <strong class="text-vp-deep">~USD $1,200M</strong> en arrendamiento y cr&eacute;ditos corporativos. Experto en arrendamiento industrial y desarrollo de entidades financieras (SOFOL a banco).</p>
+                        <p class="text-[11px] uppercase tracking-[2px] text-gray-400 mt-5">MBA, Kent Business School</p>
+                    </div>
+                    <div class="lg:col-span-5">
+                        <p class="text-[10px] uppercase tracking-[3px] text-gray-400 font-bold mb-3">Trayectoria</p>
+                        <ul class="space-y-1.5 text-[13px] text-gray-600">
+                            <li>VP Banca Corporativa &mdash; <span class="text-vp-deep">Rabobank International</span></li>
+                            <li>Director Comercial &mdash; <span class="text-vp-deep">SQN Latina</span></li>
+                            <li>Director Comercial &mdash; <span class="text-vp-deep">Bankaool</span></li>
+                            <li>Director Comercial &mdash; <span class="text-vp-deep">Agrofinanzas</span></li>
+                            <li>Dir. Finanzas y Tesorer&iacute;a &mdash; <span class="text-vp-deep">ECOMGroup</span></li>
                         </ul>
-                        <div class="border-t border-gray-100 pt-5">
-                            <p class="text-vp-deep font-bold text-[12px] uppercase tracking-[2px] mb-3">Highlights</p>
-                            <p class="text-[14px] text-gray-500 leading-[1.8]">+25 a&ntilde;os en el sector financiero. <strong class="text-vp-deep">~USD $1,200 millones</strong> colocados en arrendamiento y cr&eacute;ditos corporativos. Experto en arrendamiento puro industrial y desarrollo de entidades financieras (SOFOL a banco).</p>
-                        </div>
                     </div>
                 </article>
 
                 <!-- Socio 2: Rafael Valladares -->
-                <article class="reveal group bg-white shadow-xl shadow-vp-mid/5 overflow-hidden" style="transition-delay: 0.1s;">
-                    <div class="bg-vp-deep p-8 relative overflow-hidden">
-                        <div class="absolute inset-0 opacity-[0.06]" style="background-image: linear-gradient(rgba(201,168,76,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.5) 1px, transparent 1px); background-size: 40px 40px;"></div>
-                        <div class="relative z-10 flex items-end justify-between">
-                            <div>
-                                <h3 class="font-serif text-3xl text-white mb-1">Rafael Valladares</h3>
-                                <p class="text-vp-gold text-[11px] font-bold uppercase tracking-[3px]">Socio Fundador</p>
-                            </div>
-                            <p class="font-serif text-vp-gold-light text-5xl opacity-70">RV</p>
+                <article class="reveal grid grid-cols-1 lg:grid-cols-12 gap-8 py-14 border-b border-vp-deep/10">
+                    <div class="lg:col-span-3">
+                        <div class="aspect-[4/5] bg-vp-smoke border border-vp-deep/10 overflow-hidden">
+                            <img src="https://www.valper.mx/img/team/rafael-valladares.jpg" alt="Rafael Valladares - Socio Fundador de ValPer" class="w-full h-full object-cover object-top grayscale hover:grayscale-0 transition duration-700"
+                                 onerror="this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center relative\'><span class=\'font-serif text-7xl text-vp-deep/15\'>RV</span><span class=\'absolute bottom-3 left-3 text-[9px] uppercase tracking-[2px] text-gray-400\'>Foto pendiente</span></div>';">
                         </div>
                     </div>
-                    <div class="p-8">
-                        <p class="text-vp-deep font-bold text-[12px] uppercase tracking-[2px] mb-4">Trayectoria</p>
-                        <ul class="space-y-2 text-[14px] text-gray-600 leading-[1.7] mb-6">
-                            <li><strong class="text-vp-deep">Socio</strong> &ndash; ValPer</li>
-                            <li><strong class="text-vp-deep">Head Banca Corporativa</strong> &ndash; Banco Finterra</li>
-                            <li><strong class="text-vp-deep">Socio</strong> &ndash; PyMefi</li>
-                            <li><strong class="text-vp-deep">Socio</strong> &ndash; FGA Banqueros de Inversi&oacute;n</li>
-                            <li><strong class="text-vp-deep">Director de Cr&eacute;dito</strong> &ndash; Rabobank International</li>
-                            <li><strong class="text-vp-deep">Supervisor General</strong> &ndash; CNBV (Grupos Financieros)</li>
-                            <li><strong class="text-vp-deep">MBA</strong> &ndash; Brigham Young University</li>
+                    <div class="lg:col-span-4">
+                        <p class="text-[10px] uppercase tracking-[4px] text-vp-gold font-bold mb-3">Socio Fundador</p>
+                        <h3 class="font-serif text-3xl text-vp-deep mb-4 leading-[1.1]">Rafael Valladares</h3>
+                        <p class="text-[14px] text-gray-600 leading-[1.85]">+20 a&ntilde;os en financiamiento corporativo. <strong class="text-vp-deep">+USD $1,500M</strong> en cr&eacute;ditos sindicados (participante y agente), bursatilizaci&oacute;n, borrowing base, reportos y capital de trabajo.</p>
+                        <p class="text-[11px] uppercase tracking-[2px] text-gray-400 mt-5">MBA, Brigham Young University</p>
+                    </div>
+                    <div class="lg:col-span-5">
+                        <p class="text-[10px] uppercase tracking-[3px] text-gray-400 font-bold mb-3">Trayectoria</p>
+                        <ul class="space-y-1.5 text-[13px] text-gray-600">
+                            <li>Head Banca Corporativa &mdash; <span class="text-vp-deep">Banco Finterra</span></li>
+                            <li>Director de Cr&eacute;dito &mdash; <span class="text-vp-deep">Rabobank International</span></li>
+                            <li>Supervisor General &mdash; <span class="text-vp-deep">CNBV</span> (Grupos Financieros)</li>
+                            <li>Socio &mdash; <span class="text-vp-deep">PyMefi</span></li>
+                            <li>Socio &mdash; <span class="text-vp-deep">FGA Banqueros de Inversi&oacute;n</span></li>
                         </ul>
-                        <div class="border-t border-gray-100 pt-5">
-                            <p class="text-vp-deep font-bold text-[12px] uppercase tracking-[2px] mb-3">Highlights</p>
-                            <p class="text-[14px] text-gray-500 leading-[1.8]">+20 a&ntilde;os en financiamiento corporativo. <strong class="text-vp-deep">+USD $1,500 millones</strong> en cr&eacute;ditos sindicados (participante y banco agente), bursatilizaci&oacute;n, borrowing base, reportos y capital de trabajo.</p>
-                        </div>
                     </div>
                 </article>
 
                 <!-- Socio 3: Manuel Roza -->
-                <article class="reveal group bg-white shadow-xl shadow-vp-mid/5 overflow-hidden" style="transition-delay: 0.2s;">
-                    <div class="bg-vp-deep p-8 relative overflow-hidden">
-                        <div class="absolute inset-0 opacity-[0.06]" style="background-image: linear-gradient(rgba(201,168,76,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.5) 1px, transparent 1px); background-size: 40px 40px;"></div>
-                        <div class="relative z-10 flex items-end justify-between">
-                            <div>
-                                <h3 class="font-serif text-3xl text-white mb-1">Manuel Roza</h3>
-                                <p class="text-vp-gold text-[11px] font-bold uppercase tracking-[3px]">Socio</p>
-                            </div>
-                            <p class="font-serif text-vp-gold-light text-5xl opacity-70">MR</p>
+                <article class="reveal grid grid-cols-1 lg:grid-cols-12 gap-8 py-14 border-b border-vp-deep/10">
+                    <div class="lg:col-span-3">
+                        <div class="aspect-[4/5] bg-vp-smoke border border-vp-deep/10 flex items-center justify-center relative overflow-hidden">
+                            <span class="font-serif text-7xl text-vp-deep/15">MR</span>
+                            <span class="absolute bottom-3 left-3 text-[9px] uppercase tracking-[2px] text-gray-400">Foto pendiente</span>
                         </div>
                     </div>
-                    <div class="p-8">
-                        <p class="text-vp-deep font-bold text-[12px] uppercase tracking-[2px] mb-4">Trayectoria</p>
-                        <ul class="space-y-2 text-[14px] text-gray-600 leading-[1.7] mb-6">
-                            <li><strong class="text-vp-deep">Socio</strong> &ndash; ValPer</li>
-                            <li><strong class="text-vp-deep">Director Planeaci&oacute;n</strong> &ndash; Izzi Telecom</li>
-                            <li><strong class="text-vp-deep">Director Comercial</strong> &ndash; Grupo GMI</li>
-                            <li><strong class="text-vp-deep">Socio Director</strong> &ndash; Wolff Madrazo</li>
-                            <li><strong class="text-vp-deep">Director General</strong> &ndash; MEXVI</li>
-                            <li><strong class="text-vp-deep">Dir. Relaciones Gubernamentales LATAM</strong> &ndash; UPS</li>
-                            <li><strong class="text-vp-deep">MBA</strong> &ndash; Cox School of Business (SMU)</li>
+                    <div class="lg:col-span-4">
+                        <p class="text-[10px] uppercase tracking-[4px] text-vp-gold font-bold mb-3">Socio</p>
+                        <h3 class="font-serif text-3xl text-vp-deep mb-4 leading-[1.1]">Manuel Roza</h3>
+                        <p class="text-[14px] text-gray-600 leading-[1.85]">30 a&ntilde;os en puestos directivos internacionales: telecomunicaciones, log&iacute;stica, banca, construcci&oacute;n y desarrollo industrial. Operaciones en M&eacute;xico, EE.UU. y todo el continente.</p>
+                        <p class="text-[11px] uppercase tracking-[2px] text-gray-400 mt-5">MBA, Cox School of Business (SMU)</p>
+                    </div>
+                    <div class="lg:col-span-5">
+                        <p class="text-[10px] uppercase tracking-[3px] text-gray-400 font-bold mb-3">Trayectoria</p>
+                        <ul class="space-y-1.5 text-[13px] text-gray-600">
+                            <li>Director Planeaci&oacute;n &mdash; <span class="text-vp-deep">Izzi Telecom</span></li>
+                            <li>Director Comercial &mdash; <span class="text-vp-deep">Grupo GMI</span></li>
+                            <li>Socio Director &mdash; <span class="text-vp-deep">Wolff Madrazo</span></li>
+                            <li>Director General &mdash; <span class="text-vp-deep">MEXVI</span></li>
+                            <li>Dir. Relaciones Gubernamentales LATAM &mdash; <span class="text-vp-deep">UPS</span></li>
                         </ul>
-                        <div class="border-t border-gray-100 pt-5">
-                            <p class="text-vp-deep font-bold text-[12px] uppercase tracking-[2px] mb-3">Highlights</p>
-                            <p class="text-[14px] text-gray-500 leading-[1.8]">30 a&ntilde;os internacionales en puestos directivos: telecomunicaciones, log&iacute;stica, banca, construcci&oacute;n y desarrollo industrial. Operaciones en M&eacute;xico, EE.UU. y todo el continente americano.</p>
-                        </div>
                     </div>
                 </article>
 
                 <!-- Socio 4: Javier Valadez -->
-                <article class="reveal group bg-white shadow-xl shadow-vp-mid/5 overflow-hidden" style="transition-delay: 0.3s;">
-                    <div class="bg-vp-deep p-8 relative overflow-hidden">
-                        <div class="absolute inset-0 opacity-[0.06]" style="background-image: linear-gradient(rgba(201,168,76,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.5) 1px, transparent 1px); background-size: 40px 40px;"></div>
-                        <div class="relative z-10 flex items-end justify-between">
-                            <div>
-                                <h3 class="font-serif text-3xl text-white mb-1">Javier Valadez</h3>
-                                <p class="text-vp-gold text-[11px] font-bold uppercase tracking-[3px]">Socio</p>
-                            </div>
-                            <p class="font-serif text-vp-gold-light text-5xl opacity-70">JV</p>
+                <article class="reveal grid grid-cols-1 lg:grid-cols-12 gap-8 py-14 border-b border-vp-deep/10">
+                    <div class="lg:col-span-3">
+                        <div class="aspect-[4/5] bg-vp-smoke border border-vp-deep/10 flex items-center justify-center relative overflow-hidden">
+                            <span class="font-serif text-7xl text-vp-deep/15">JV</span>
+                            <span class="absolute bottom-3 left-3 text-[9px] uppercase tracking-[2px] text-gray-400">Foto pendiente</span>
                         </div>
                     </div>
-                    <div class="p-8">
-                        <p class="text-vp-deep font-bold text-[12px] uppercase tracking-[2px] mb-4">Trayectoria</p>
-                        <ul class="space-y-2 text-[14px] text-gray-600 leading-[1.7] mb-6">
-                            <li><strong class="text-vp-deep">Socio</strong> &ndash; ValPer</li>
-                            <li><strong class="text-vp-deep">CEO</strong> &ndash; American Express Bank M&eacute;xico</li>
-                            <li><strong class="text-vp-deep">CEO</strong> &ndash; HSBC Colombia</li>
-                            <li><strong class="text-vp-deep">COO</strong> &ndash; HSBC Latam</li>
-                            <li><strong class="text-vp-deep">CRO</strong> &ndash; HSBC Per&uacute; / Panam&aacute;</li>
-                            <li><strong class="text-vp-deep">Corporate &amp; Investment Banking VP</strong> &ndash; HSBC</li>
-                            <li><strong class="text-vp-deep">MBA</strong> &ndash; ITAM Corporate Finance</li>
+                    <div class="lg:col-span-4">
+                        <p class="text-[10px] uppercase tracking-[4px] text-vp-gold font-bold mb-3">Socio</p>
+                        <h3 class="font-serif text-3xl text-vp-deep mb-4 leading-[1.1]">Javier Valadez</h3>
+                        <p class="text-[14px] text-gray-600 leading-[1.85]">Banca corporativa y retail. Project finance en hoteles, carreteras de peaje, terminales mar&iacute;timas y privatizaciones. Autoridad de aprobaci&oacute;n hasta <strong class="text-vp-deep">USD $100M</strong>.</p>
+                        <p class="text-[11px] uppercase tracking-[2px] text-gray-400 mt-5">MBA, ITAM Corporate Finance</p>
+                    </div>
+                    <div class="lg:col-span-5">
+                        <p class="text-[10px] uppercase tracking-[3px] text-gray-400 font-bold mb-3">Trayectoria</p>
+                        <ul class="space-y-1.5 text-[13px] text-gray-600">
+                            <li>CEO &mdash; <span class="text-vp-deep">American Express Bank M&eacute;xico</span></li>
+                            <li>CEO &mdash; <span class="text-vp-deep">HSBC Colombia</span></li>
+                            <li>COO &mdash; <span class="text-vp-deep">HSBC Latam</span></li>
+                            <li>CRO &mdash; <span class="text-vp-deep">HSBC Per&uacute;</span> &amp; <span class="text-vp-deep">HSBC Panam&aacute;</span></li>
+                            <li>Corporate &amp; Investment Banking VP &mdash; <span class="text-vp-deep">HSBC</span></li>
                         </ul>
-                        <div class="border-t border-gray-100 pt-5">
-                            <p class="text-vp-deep font-bold text-[12px] uppercase tracking-[2px] mb-3">Highlights</p>
-                            <p class="text-[14px] text-gray-500 leading-[1.8]">Amplia experiencia en banca corporativa y retail. Project finance en hoteles, carreteras de peaje, terminales mar&iacute;timas y privatizaciones. Autoridad de aprobaci&oacute;n hasta <strong class="text-vp-deep">USD $100 millones</strong>.</p>
-                        </div>
                     </div>
                 </article>
+
             </div>
         </div>
     </section>
 
     <!-- CTA -->
     <section class="relative py-32 px-6 overflow-hidden" style="background: radial-gradient(ellipse at 50% 100%, #2c2345, #0f0c18);">
-        <div class="glow-orb w-[400px] h-[400px] bg-vp-gold/15 bottom-0 left-1/2 -translate-x-1/2"></div>
         <div class="relative z-10 max-w-3xl mx-auto text-center">
             <p class="reveal text-vp-gold text-[12px] font-bold uppercase tracking-[5px] mb-5">Hablemos</p>
             <h2 class="reveal font-serif text-4xl md:text-5xl text-white leading-[1.2] mb-8">&iquest;Listo para Impulsar<br>tu Empresa?</h2>
@@ -978,90 +719,68 @@
     </section>
 
     <!-- CONTACTO -->
-    <section id="contacto" class="relative py-32 px-6 bg-white overflow-hidden">
-        <div class="glow-orb w-[400px] h-[400px] bg-vp-gold/5 top-0 right-0"></div>
-        <div class="max-w-5xl mx-auto relative z-10">
-            <div class="text-center mb-20">
-                <p class="reveal text-vp-gold text-[12px] font-bold uppercase tracking-[5px] mb-5">Cont&aacute;ctanos</p>
-                <h2 class="reveal font-serif text-4xl md:text-5xl text-vp-deep">Contacto</h2>
-            </div>
-            <div class="grid grid-cols-1 lg:grid-cols-5 gap-16">
-                <div class="reveal-left lg:col-span-2">
-                    <div class="mb-10">
-                        <h3 class="text-[12px] font-bold uppercase tracking-[2px] text-vp-deep mb-3">Sitio Oficial</h3>
-                        <a href="https://www.valper.mx" target="_blank" rel="noopener" class="text-[15px] text-vp-mid hover:text-vp-gold transition duration-500">www.valper.mx</a>
-                    </div>
-                    <div class="mb-10">
-                        <h3 class="text-[12px] font-bold uppercase tracking-[2px] text-vp-deep mb-5">Contacto Directo con Socios</h3>
-                        <ul class="space-y-3">
-                            <li class="flex items-center justify-between group border-b border-gray-100 py-2">
-                                <span class="text-[13px] text-gray-500">Manuel Roza</span>
-                                <a href="mailto:manuel.rozatrevino@valper.mx" class="text-[13px] text-vp-mid group-hover:text-vp-gold transition duration-500">manuel.rozatrevino@valper.mx</a>
-                            </li>
-                            <li class="flex items-center justify-between group border-b border-gray-100 py-2">
-                                <span class="text-[13px] text-gray-500">Rafael Valladares</span>
-                                <a href="mailto:rafael.valladares@valper.mx" class="text-[13px] text-vp-mid group-hover:text-vp-gold transition duration-500">rafael.valladares@valper.mx</a>
-                            </li>
-                            <li class="flex items-center justify-between group border-b border-gray-100 py-2">
-                                <span class="text-[13px] text-gray-500">Javier Valadez</span>
-                                <a href="mailto:javier.valadez@valper.mx" class="text-[13px] text-vp-mid group-hover:text-vp-gold transition duration-500">javier.valadez@valper.mx</a>
-                            </li>
-                            <li class="flex items-center justify-between group border-b border-gray-100 py-2">
-                                <span class="text-[13px] text-gray-500">Jos&eacute; Antonio P&eacute;rez</span>
-                                <a href="mailto:josea.perez@valper.mx" class="text-[13px] text-vp-mid group-hover:text-vp-gold transition duration-500">josea.perez@valper.mx</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h3 class="text-[12px] font-bold uppercase tracking-[2px] text-vp-deep mb-3">Horario</h3>
-                        <p class="text-[15px] text-gray-500">Lunes &ndash; Viernes: 9:00 &ndash; 18:00</p>
+    <section id="contacto" class="relative py-32 px-6 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+                <div class="reveal-left lg:col-span-5">
+                    <p class="text-vp-gold text-[10px] font-bold uppercase tracking-[4px] mb-5">Contacto</p>
+                    <h2 class="font-serif text-4xl md:text-5xl text-vp-deep leading-[1.15] mb-8">Hablemos de su <em class="text-vp-mid">transacci&oacute;n</em>.</h2>
+                    <p class="text-gray-600 text-[15px] leading-[1.85] mb-10 max-w-md">Escr&iacute;banos directamente a cualquier socio o utilice el formulario. Toda la informaci&oacute;n se trata con confidencialidad.</p>
+
+                    <ul class="border-t border-vp-deep/10">
+                        <li class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 py-3 border-b border-vp-deep/10">
+                            <span class="text-[13px] text-vp-deep">Manuel Roza</span>
+                            <a href="mailto:manuel.rozatrevino@valper.mx" class="text-[13px] text-vp-mid hover:text-vp-gold transition">manuel.rozatrevino@valper.mx</a>
+                        </li>
+                        <li class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 py-3 border-b border-vp-deep/10">
+                            <span class="text-[13px] text-vp-deep">Rafael Valladares</span>
+                            <a href="mailto:rafael.valladares@valper.mx" class="text-[13px] text-vp-mid hover:text-vp-gold transition">rafael.valladares@valper.mx</a>
+                        </li>
+                        <li class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 py-3 border-b border-vp-deep/10">
+                            <span class="text-[13px] text-vp-deep">Javier Valadez</span>
+                            <a href="mailto:javier.valadez@valper.mx" class="text-[13px] text-vp-mid hover:text-vp-gold transition">javier.valadez@valper.mx</a>
+                        </li>
+                        <li class="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 py-3 border-b border-vp-deep/10">
+                            <span class="text-[13px] text-vp-deep">Jos&eacute; Antonio P&eacute;rez</span>
+                            <a href="mailto:josea.perez@valper.mx" class="text-[13px] text-vp-mid hover:text-vp-gold transition">josea.perez@valper.mx</a>
+                        </li>
+                    </ul>
+
+                    <div class="mt-10 text-[12px] text-gray-500 space-y-1.5">
+                        <p>Ciudad de M&eacute;xico &nbsp;&middot;&nbsp; Lun &ndash; Vie &nbsp;9:00&ndash;18:00</p>
+                        <p><a href="https://www.valper.mx" target="_blank" rel="noopener" class="text-vp-mid hover:text-vp-gold transition">www.valper.mx &rarr;</a></p>
                     </div>
                 </div>
-                <div class="reveal-right lg:col-span-3">
-                    <div class="bg-vp-smoke p-10 lg:p-12 relative">
-                        <div class="absolute top-0 left-0 w-full h-[2px] bg-vp-gold"></div>
-                        <h3 class="font-serif text-2xl text-vp-deep mb-2">Escr&iacute;benos</h3>
-                        <p class="text-[13px] text-gray-500 mb-8">Te responderemos en menos de 24 horas h&aacute;biles.</p>
-                        <form class="space-y-6" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Mensaje Enviado'; this.querySelector('button').classList.add('bg-green-700'); setTimeout(() => { this.querySelector('button').textContent='Enviar Mensaje'; this.querySelector('button').classList.remove('bg-green-700'); }, 3000);">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-[11px] font-bold uppercase tracking-[2px] text-vp-deep mb-2">Nombre</label>
-                                    <input type="text" required class="w-full border-b border-gray-200 bg-transparent px-0 py-3 text-[15px] text-vp-deep focus:outline-none focus:border-vp-gold transition duration-500" placeholder="Tu nombre completo">
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] font-bold uppercase tracking-[2px] text-vp-deep mb-2">Empresa</label>
-                                    <input type="text" class="w-full border-b border-gray-200 bg-transparent px-0 py-3 text-[15px] text-vp-deep focus:outline-none focus:border-vp-gold transition duration-500" placeholder="Nombre de tu empresa">
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-[11px] font-bold uppercase tracking-[2px] text-vp-deep mb-2">Correo</label>
-                                    <input type="email" required class="w-full border-b border-gray-200 bg-transparent px-0 py-3 text-[15px] text-vp-deep focus:outline-none focus:border-vp-gold transition duration-500" placeholder="tu@correo.com">
-                                </div>
-                                <div>
-                                    <label class="block text-[11px] font-bold uppercase tracking-[2px] text-vp-deep mb-2">Monto requerido</label>
-                                    <input type="text" class="w-full border-b border-gray-200 bg-transparent px-0 py-3 text-[15px] text-vp-deep focus:outline-none focus:border-vp-gold transition duration-500" placeholder="USD / MXN">
-                                </div>
+
+                <div class="reveal-right lg:col-span-7">
+                    <form class="space-y-6" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Mensaje Enviado'; this.querySelector('button').classList.add('bg-green-700'); setTimeout(() => { this.querySelector('button').textContent='Enviar Mensaje'; this.querySelector('button').classList.remove('bg-green-700'); }, 3000);">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-[3px] text-vp-deep mb-2">Nombre</label>
+                                <input type="text" required class="w-full border-b border-vp-deep/20 bg-transparent px-0 py-3 text-[15px] text-vp-deep focus:outline-none focus:border-vp-gold transition">
                             </div>
                             <div>
-                                <label class="block text-[11px] font-bold uppercase tracking-[2px] text-vp-deep mb-2">Sector</label>
-                                <select class="w-full border-b border-gray-200 bg-transparent px-0 py-3 text-[15px] text-vp-deep focus:outline-none focus:border-vp-gold transition duration-500">
-                                    <option>Selecciona un sector</option>
-                                    <option>Inmobiliario</option>
-                                    <option>Industrial</option>
-                                    <option>Agroalimentario</option>
-                                    <option>Financiero (Sofomes / Arrendadoras)</option>
-                                    <option>Hotelero / Infraestructura</option>
-                                    <option>Otro</option>
-                                </select>
+                                <label class="block text-[10px] font-bold uppercase tracking-[3px] text-vp-deep mb-2">Empresa</label>
+                                <input type="text" class="w-full border-b border-vp-deep/20 bg-transparent px-0 py-3 text-[15px] text-vp-deep focus:outline-none focus:border-vp-gold transition">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-[3px] text-vp-deep mb-2">Correo</label>
+                                <input type="email" required class="w-full border-b border-vp-deep/20 bg-transparent px-0 py-3 text-[15px] text-vp-deep focus:outline-none focus:border-vp-gold transition">
                             </div>
                             <div>
-                                <label class="block text-[11px] font-bold uppercase tracking-[2px] text-vp-deep mb-2">Mensaje</label>
-                                <textarea rows="4" required class="w-full border-b border-gray-200 bg-transparent px-0 py-3 text-[15px] text-vp-deep focus:outline-none focus:border-vp-gold transition duration-500 resize-none" placeholder="Cu&eacute;ntanos sobre tu necesidad de financiamiento"></textarea>
+                                <label class="block text-[10px] font-bold uppercase tracking-[3px] text-vp-deep mb-2">Monto / Sector</label>
+                                <input type="text" class="w-full border-b border-vp-deep/20 bg-transparent px-0 py-3 text-[15px] text-vp-deep focus:outline-none focus:border-vp-gold transition" placeholder="USD / MXN &middot; Sector">
                             </div>
-                            <button type="submit" class="magnetic-btn w-full bg-vp-deep text-white py-4 text-[12px] font-bold uppercase tracking-[2px] hover:bg-vp-purple transition duration-500">Enviar Mensaje</button>
-                        </form>
-                    </div>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-[3px] text-vp-deep mb-2">Mensaje</label>
+                            <textarea rows="5" required class="w-full border-b border-vp-deep/20 bg-transparent px-0 py-3 text-[15px] text-vp-deep focus:outline-none focus:border-vp-gold transition resize-none" placeholder="Cu&eacute;ntenos brevemente sobre su necesidad de financiamiento."></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-vp-deep text-white py-4 text-[11px] font-bold uppercase tracking-[3px] hover:bg-vp-mid transition">Enviar Mensaje</button>
+                        <p class="text-[11px] text-gray-400 leading-[1.7] pt-2">Las propuestas se formalizan mediante <em class="text-vp-deep not-italic">carta mandato</em> antes de iniciar cualquier proceso.</p>
+                    </form>
                 </div>
             </div>
         </div>
@@ -1133,222 +852,119 @@
         const loader = document.getElementById('loader');
         const tl = gsap.timeline({
             onComplete: () => {
-                gsap.to(loader, { yPercent: -100, duration: 0.8, ease: 'power3.inOut', onComplete: () => loader.remove() });
-                gsap.to('#topbar', { y: 0, duration: 0.6, ease: 'power2.out', delay: 0.2 });
+                gsap.to(loader, { yPercent: -100, duration: 0.6, ease: 'power3.inOut', onComplete: () => loader.remove() });
+                gsap.to('#topbar', { y: 0, duration: 0.5, ease: 'power2.out', delay: 0.1 });
                 initAnimations();
             }
         });
-        tl.to('#loader-text', { opacity: 1, duration: 0.6, ease: 'power2.out' })
-          .to('#loader-line', { width: '120px', duration: 1.2, ease: 'power2.inOut' }, '-=0.3')
-          .to('#loader-text', { letterSpacing: '12px', duration: 0.6, ease: 'power2.inOut' }, '-=0.6');
-
-        // CURSOR
-        const dot = document.querySelector('.cursor-dot');
-        const ring = document.querySelector('.cursor-ring');
-        let mx = 0, my = 0, rx = 0, ry = 0;
-        document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
-        function animateCursor() {
-            rx += (mx - rx) * 0.15;
-            ry += (my - ry) * 0.15;
-            dot.style.transform = `translate(${mx - 4}px, ${my - 4}px)`;
-            ring.style.transform = `translate(${rx - 20}px, ${ry - 20}px)`;
-            requestAnimationFrame(animateCursor);
-        }
-        animateCursor();
-        document.querySelectorAll('a, button, .tilt-card, .activity-card, input, textarea').forEach(el => {
-            el.addEventListener('mouseenter', () => ring.classList.add('hovering'));
-            el.addEventListener('mouseleave', () => ring.classList.remove('hovering'));
-        });
-
-        // PARTICLES
-        const canvas = document.getElementById('particles-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
-        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-
-        class Particle {
-            constructor() { this.reset(); }
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 1.5 + 0.5;
-                this.speedX = (Math.random() - 0.5) * 0.3;
-                this.speedY = (Math.random() - 0.5) * 0.3;
-                this.opacity = Math.random() * 0.5 + 0.1;
-            }
-            update() {
-                this.x += this.speedX; this.y += this.speedY;
-                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
-            }
-            draw() {
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(201, 168, 76, ${this.opacity})`; ctx.fill();
-            }
-        }
-        for (let i = 0; i < 60; i++) particles.push(new Particle());
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            for (let i = 0; i < particles.length; i++) {
-                for (let j = i + 1; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 150) {
-                        ctx.beginPath();
-                        ctx.strokeStyle = `rgba(201, 168, 76, ${0.05 * (1 - dist / 150)})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.stroke();
-                    }
-                }
-            }
-            requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
+        tl.to('#loader-text', { opacity: 1, duration: 0.4, ease: 'power2.out' })
+          .to('#loader-line', { width: '80px', duration: 0.8, ease: 'power2.inOut' }, '-=0.2');
 
         // SCROLL PROGRESS
+        const progressEl = document.querySelector('.scroll-progress');
         window.addEventListener('scroll', () => {
             const progress = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-            document.querySelector('.scroll-progress').style.width = progress + '%';
+            if (progressEl) progressEl.style.width = progress + '%';
         });
 
         // SMOOTH SCROLL NAV
         document.querySelectorAll('a[href^="#"]').forEach(a => {
             a.addEventListener('click', e => {
+                const href = a.getAttribute('href');
+                if (href === '#' || href.length < 2) return;
+                const target = document.querySelector(href);
+                if (!target) return;
                 e.preventDefault();
-                const target = document.querySelector(a.getAttribute('href'));
-                if (target) gsap.to(window, { duration: 1.2, scrollTo: { y: target, offsetY: 80 }, ease: 'power3.inOut' });
-                document.getElementById('mobile-nav').classList.add('hidden');
+                gsap.to(window, { duration: 0.9, scrollTo: { y: target, offsetY: 80 }, ease: 'power2.inOut' });
+                const mobileNav = document.getElementById('mobile-nav');
+                if (mobileNav) mobileNav.classList.add('hidden');
             });
         });
 
         // MOBILE MENU
-        document.getElementById('mobile-toggle').addEventListener('click', () => {
+        const mt = document.getElementById('mobile-toggle');
+        if (mt) mt.addEventListener('click', () => {
             document.getElementById('mobile-nav').classList.toggle('hidden');
         });
 
         function initAnimations() {
-            // Hero
-            const heroTL = gsap.timeline({ delay: 0.3 });
-            heroTL.from('#hero-label span', { y: 40, opacity: 0, duration: 0.8, ease: 'power3.out' })
-                  .from('#hero-title', { y: 60, opacity: 0, duration: 1, ease: 'power3.out' }, '-=0.4')
-                  .from('#hero-desc', { y: 40, opacity: 0, duration: 0.8, ease: 'power3.out' }, '-=0.5')
-                  .from('#hero-ctas', { y: 30, opacity: 0, duration: 0.8, ease: 'power3.out' }, '-=0.4')
-                  .from('#scroll-indicator', { opacity: 0, y: 20, duration: 0.6 }, '-=0.2');
-
-            // Orbs float
-            gsap.to('#orb1', { x: 30, y: -20, duration: 8, ease: 'sine.inOut', repeat: -1, yoyo: true });
-            gsap.to('#orb2', { x: -20, y: 30, duration: 10, ease: 'sine.inOut', repeat: -1, yoyo: true });
-            gsap.to('#orb3', { x: 40, y: -30, duration: 12, ease: 'sine.inOut', repeat: -1, yoyo: true });
-
-            // Scroll indicator fade
-            gsap.to('#scroll-indicator', {
-                opacity: 0,
-                scrollTrigger: { trigger: '#compania', start: 'top 80%', end: 'top 50%', scrub: true }
-            });
+            // Hero entrance
+            const heroTL = gsap.timeline({ delay: 0.15 });
+            heroTL.from('#hero-label span', { y: 24, opacity: 0, duration: 0.6, ease: 'power3.out' })
+                  .from('#hero-title', { y: 32, opacity: 0, duration: 0.8, ease: 'power3.out' }, '-=0.3')
+                  .from('#hero-desc', { y: 24, opacity: 0, duration: 0.6, ease: 'power3.out' }, '-=0.4')
+                  .from('#hero-ctas', { y: 16, opacity: 0, duration: 0.6, ease: 'power3.out' }, '-=0.3');
 
             // Reveals
             gsap.utils.toArray('.reveal').forEach(el => {
-                gsap.to(el, { y: 0, opacity: 1, duration: 1, ease: 'power3.out',
-                    scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }
+                gsap.to(el, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out',
+                    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
                 });
             });
             gsap.utils.toArray('.reveal-left').forEach(el => {
-                gsap.to(el, { x: 0, opacity: 1, duration: 1, ease: 'power3.out',
-                    scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }
+                gsap.to(el, { x: 0, opacity: 1, duration: 0.8, ease: 'power3.out',
+                    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
                 });
             });
             gsap.utils.toArray('.reveal-right').forEach(el => {
-                gsap.to(el, { x: 0, opacity: 1, duration: 1, ease: 'power3.out',
-                    scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }
+                gsap.to(el, { x: 0, opacity: 1, duration: 0.8, ease: 'power3.out',
+                    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
                 });
             });
             gsap.utils.toArray('.reveal-scale').forEach(el => {
-                gsap.to(el, { scale: 1, opacity: 1, duration: 1.2, ease: 'power3.out',
-                    scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }
+                gsap.to(el, { scale: 1, opacity: 1, duration: 0.9, ease: 'power3.out',
+                    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
                 });
             });
 
-            // Counter animation
+            // Counter animation (sober — only on stat-value elements)
             gsap.utils.toArray('.stat-value').forEach(el => {
                 const target = parseInt(el.dataset.target);
                 if (!target) return;
                 ScrollTrigger.create({
-                    trigger: el, start: 'top 85%', once: true,
+                    trigger: el, start: 'top 90%', once: true,
                     onEnter: () => {
                         gsap.to(el, {
-                            duration: 2, ease: 'power2.out',
+                            duration: 1.4, ease: 'power2.out',
                             onUpdate: function() { el.textContent = Math.round(this.progress() * target); }
                         });
                     }
                 });
             });
 
-            // Horizontal scroll for activities (compact - scrolls through cards smoothly)
-            const aWrapper = document.getElementById('activities-wrapper');
-            const aTrack = document.getElementById('activities-track');
-            if (aWrapper && aTrack) {
-                const totalScroll = aTrack.scrollWidth - window.innerWidth;
-                gsap.to(aTrack, {
-                    x: -totalScroll,
-                    ease: 'none',
-                    scrollTrigger: {
-                        trigger: aWrapper,
-                        start: 'top top',
-                        end: () => '+=' + (totalScroll * 0.8),
-                        scrub: 1.5,
-                        pin: true,
-                        anticipatePin: 1,
-                    }
-                });
-            }
-
             // Header bg on scroll
             ScrollTrigger.create({
-                start: 100,
+                start: 80,
                 onUpdate: () => {
                     const header = document.getElementById('header');
-                    if (window.scrollY > 100) {
-                        header.style.background = 'rgba(15, 12, 24, 0.9)';
-                        header.style.backdropFilter = 'blur(20px)';
+                    if (!header) return;
+                    if (window.scrollY > 80) {
+                        header.style.background = 'rgba(15, 12, 24, 0.92)';
+                        header.style.backdropFilter = 'blur(16px)';
+                        header.style.borderBottom = '1px solid rgba(255,255,255,0.06)';
                     } else {
                         header.style.background = 'transparent';
                         header.style.backdropFilter = 'none';
+                        header.style.borderBottom = '0';
                     }
                 }
             });
 
-            // 3D tilt cards
-            document.querySelectorAll('.tilt-card').forEach(card => {
-                card.addEventListener('mousemove', e => {
-                    const rect = card.getBoundingClientRect();
-                    const rotateX = ((e.clientY - rect.top) - rect.height / 2) / (rect.height / 2) * -4;
-                    const rotateY = ((e.clientX - rect.left) - rect.width / 2) / (rect.width / 2) * 4;
-                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-                });
-                card.addEventListener('mouseleave', () => {
-                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+            // Active section highlight in nav
+            const sections = ['compania','proceso','productos','valor','nosotros','contacto'];
+            sections.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                ScrollTrigger.create({
+                    trigger: el, start: 'top 50%', end: 'bottom 50%',
+                    onToggle: self => {
+                        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('is-active'));
+                        if (self.isActive) {
+                            document.querySelectorAll(`a[href="#${id}"]`).forEach(l => l.classList.add('is-active'));
+                        }
+                    }
                 });
             });
-
-            // Magnetic buttons
-            document.querySelectorAll('.magnetic-btn').forEach(btn => {
-                btn.addEventListener('mousemove', e => {
-                    const rect = btn.getBoundingClientRect();
-                    const x = e.clientX - rect.left - rect.width / 2;
-                    const y = e.clientY - rect.top - rect.height / 2;
-                    btn.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
-                });
-                btn.addEventListener('mouseleave', () => { btn.style.transform = 'translate(0, 0)'; });
-            });
-
-            // Parallax orbs on scroll
-            gsap.to('#orb1', { y: -200, scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1 } });
-            gsap.to('#orb2', { y: -100, scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 1 } });
         }
     })();
     </script>

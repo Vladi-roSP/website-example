@@ -1,3 +1,5 @@
 node_modules/
 screenshot-v*.png
+sec-*.png
+screenshot-sections.js
 .DS_Store
