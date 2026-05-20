@@ -12,7 +12,7 @@
     <meta property="og:locale" content="es_MX">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
@@ -21,21 +21,27 @@
             theme: {
                 extend: {
                     colors: {
+                        // Finance palette — purple/gold tokens REMAPPED to navy/forest.
+                        // Names kept so all 90+ existing references just work; values changed.
                         'vp': {
-                            'deep': '#1a1433',
-                            'purple': '#2c2345',
-                            'mid': '#4d3d61',
-                            'soft': '#6b5a80',
-                            'accent': '#8a7b9e',
-                            'gold': '#c9a84c',
-                            'gold-light': '#dfc07a',
-                            'cream': '#f8f5f0',
-                            'smoke': '#fafaf8',
+                            'deep':       '#0E1A2B', // navy ink (was purple)
+                            'purple':     '#14243F', // slate-navy (was lighter purple)
+                            'mid':        '#1C4536', // deep forest (was mid purple)
+                            'soft':       '#4A5568', // neutral slate (was soft purple)
+                            'accent':     '#9CA3AF', // cool gray (was light purple)
+                            'gold':       '#2E8B62', // medium forest (was gold #2E8B62)
+                            'gold-light': '#4FA882', // bright forest (was gold-light)
+                            'cream':      '#F5F1E8', // warmer cream
+                            'smoke':      '#FAFAF8', // unchanged
                         }
                     },
                     fontFamily: {
-                        sans: ['PT Sans', 'Helvetica Neue', 'Arial', 'sans-serif'],
-                        serif: ['Playfair Display', 'Georgia', 'serif'],
+                        // Single typeface across the entire site — Newsreader is a serif
+                        // designed for editorial / financial reading. Same family for
+                        // both `font-sans` and `font-serif` utilities so every existing
+                        // class reference resolves to the same font.
+                        sans:  ['Newsreader', 'Georgia', 'serif'],
+                        serif: ['Newsreader', 'Georgia', 'serif'],
                     },
                 }
             }
@@ -47,18 +53,26 @@
             text-rendering: geometricPrecision;
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
-            background: #fafaf8;
+            background: #FFFFFF; /* pure white — JPMC sobriety */
+            color: #0E1A2B;
+            font-variant-numeric: tabular-nums; /* finance / numbers — every figure aligns */
+            font-feature-settings: 'ss01' on, 'cv02' on; /* Newsreader stylistic set + alt 4 */
+        }
+        /* Numerals in display sizes use lining figures, slightly tighter tracking. */
+        .num, .stat-value, .hv-num {
+            font-variant-numeric: tabular-nums lining-nums;
+            letter-spacing: -0.01em;
         }
 
         .loader {
             position: fixed; inset: 0; z-index: 10000;
-            background: #0f0c18;
+            background: #0A1422;
             display: flex; align-items: center; justify-content: center; flex-direction: column;
         }
-        .loader-line { width: 0; height: 1px; background: linear-gradient(90deg, transparent, #c9a84c, transparent); }
+        .loader-line { width: 0; height: 1px; background: linear-gradient(90deg, transparent, #2E8B62, transparent); }
         .loader-text {
             font-family: 'Playfair Display', serif;
-            color: #c9a84c; font-size: 13px;
+            color: #2E8B62; font-size: 13px;
             letter-spacing: 6px; text-transform: uppercase; opacity: 0;
         }
 
@@ -72,21 +86,21 @@
         .scroll-progress {
             position: fixed; top: 0; left: 0;
             height: 1px; width: 0%;
-            background: #c9a84c;
+            background: #2E8B62;
             z-index: 9001;
         }
 
         .nav-link { position: relative; }
         .nav-link::after {
             content: ''; position: absolute; bottom: -4px; left: 50%; width: 0; height: 1px;
-            background: #c9a84c;
+            background: #2E8B62;
             transition: width 0.4s ease, left 0.4s ease;
         }
         .nav-link:hover::after { width: 100%; left: 0; }
         .nav-link.is-active { color: #fff; }
         .nav-link.is-active::after { width: 100%; left: 0; }
 
-        .rule { height: 1px; background: rgba(201,168,76,0.25); display: block; }
+        .rule { height: 1px; background: rgba(46,139,98,0.25); display: block; }
     </style>
 </head>
 <body class="font-sans text-gray-400">
@@ -99,158 +113,142 @@
         <div class="loader-line mt-4" id="loader-line"></div>
     </div>
 
-    <!-- TOP BAR -->
-    <div class="fixed top-0 left-0 right-0 z-[100] bg-vp-deep/80 backdrop-blur-md border-b border-white/5 translate-y-[-100%]" id="topbar">
-        <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-6 text-[11px] text-gray-500">
-                <a href="https://www.valper.mx" target="_blank" rel="noopener" class="hover:text-vp-gold transition duration-500">www.valper.mx</a>
-                <a href="mailto:contacto@valper.mx" class="hover:text-vp-gold transition duration-500">contacto@valper.mx</a>
+    <!-- TOP BAR — hairline cream over white -->
+    <div class="fixed top-0 left-0 right-0 z-[100] bg-white border-b border-vp-deep/10 translate-y-[-100%]" id="topbar">
+        <div class="max-w-7xl mx-auto px-6 py-2.5 flex justify-between items-center">
+            <div class="flex items-center gap-6 text-[12px] text-vp-soft font-serif">
+                <a href="https://www.valper.mx" target="_blank" rel="noopener" class="hover:text-vp-deep transition duration-300">www.valper.mx</a>
+                <a href="mailto:contacto@valper.mx" class="hover:text-vp-deep transition duration-300">contacto@valper.mx</a>
                 <span class="hidden sm:inline">Lun &ndash; Vie: 9:00 &ndash; 18:00</span>
             </div>
-            <a href="#" class="text-[11px] text-gray-500 hover:text-vp-gold transition duration-500 uppercase tracking-[3px]">English</a>
         </div>
     </div>
 
-    <!-- HEADER -->
-    <header id="header" class="fixed top-[38px] left-0 right-0 z-[99] bg-transparent transition-all duration-700">
-        <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
-            <!-- Logo: SVG monogram for premium feel -->
+    <!-- HEADER — sits on white, navy text -->
+    <header id="header" class="fixed top-[34px] left-0 right-0 z-[99] bg-white/95 backdrop-blur-md border-b border-vp-deep/8 transition-all duration-300 text-vp-deep">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
             <a href="#hero" class="flex items-center gap-3 group">
-                <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" class="transition duration-500">
-                    <rect x="1" y="1" width="42" height="42" stroke="#c9a84c" stroke-width="1.5" fill="none" class="group-hover:fill-[rgba(201,168,76,0.08)] transition duration-500"/>
-                    <text x="8" y="30" font-family="Playfair Display, serif" font-size="22" font-weight="700" fill="white" class="group-hover:fill-[#c9a84c] transition duration-500">VP</text>
+                <svg width="38" height="38" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" class="transition duration-300">
+                    <rect x="1" y="1" width="42" height="42" stroke="currentColor" stroke-width="1.25" fill="none"/>
+                    <text x="8" y="30" font-family="Newsreader, serif" font-size="22" font-weight="400" fill="currentColor">VP</text>
                 </svg>
                 <div class="hidden sm:flex flex-col">
-                    <span class="text-[13px] font-bold tracking-[3px] text-white leading-none">VALPER</span>
-                    <span class="text-[9px] tracking-[2.5px] text-vp-gold/70 uppercase mt-0.5">Inteligencia Financiera</span>
+                    <span class="font-serif text-[14px] font-medium tracking-[0.18em] leading-none">VALPER</span>
+                    <span class="font-serif text-[10px] tracking-[0.18em] text-vp-soft uppercase mt-1">Inteligencia Financiera</span>
                 </div>
             </a>
-            <nav class="hidden lg:flex items-center gap-7">
-                <a href="#compania" class="nav-link text-[11px] font-bold uppercase tracking-[2px] text-gray-400 hover:text-white transition duration-500">Compa&ntilde;&iacute;a</a>
-                <a href="#proceso" class="nav-link text-[11px] font-bold uppercase tracking-[2px] text-gray-400 hover:text-white transition duration-500">Proceso</a>
-                <a href="#productos" class="nav-link text-[11px] font-bold uppercase tracking-[2px] text-gray-400 hover:text-white transition duration-500">Productos</a>
-                <a href="#valor" class="nav-link text-[11px] font-bold uppercase tracking-[2px] text-gray-400 hover:text-white transition duration-500">Por qu&eacute; ValPer</a>
-                <a href="#nosotros" class="nav-link text-[11px] font-bold uppercase tracking-[2px] text-gray-400 hover:text-white transition duration-500">Socios</a>
-                <a href="#contacto" class="magnetic-btn ml-4 px-6 py-2.5 border border-vp-gold/40 text-vp-gold text-[11px] font-bold uppercase tracking-[2px] hover:bg-vp-gold hover:text-vp-deep transition duration-500">Contacto</a>
+            <nav class="hidden lg:flex items-center gap-9">
+                <a href="#compania" class="nav-link font-serif text-[14px] text-vp-deep/75 hover:text-vp-deep transition duration-300">Compa&ntilde;&iacute;a</a>
+                <a href="#proceso" class="nav-link font-serif text-[14px] text-vp-deep/75 hover:text-vp-deep transition duration-300">Proceso</a>
+                <a href="#productos" class="nav-link font-serif text-[14px] text-vp-deep/75 hover:text-vp-deep transition duration-300">Productos</a>
+                <a href="#valor" class="nav-link font-serif text-[14px] text-vp-deep/75 hover:text-vp-deep transition duration-300">Por qu&eacute; ValPer</a>
+                <a href="#nosotros" class="nav-link font-serif text-[14px] text-vp-deep/75 hover:text-vp-deep transition duration-300">Socios</a>
+                <a href="#contacto" class="ml-3 inline-flex items-center bg-vp-deep text-white px-5 py-2.5 font-serif text-[13px] font-medium hover:bg-vp-purple transition duration-300">Contacto</a>
             </nav>
-            <button id="mobile-toggle" class="lg:hidden text-white">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <button id="mobile-toggle" class="lg:hidden text-vp-deep">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.25" d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
         </div>
-        <div id="mobile-nav" class="hidden lg:hidden bg-vp-deep/95 backdrop-blur-xl border-t border-white/5 px-6 pb-6">
-            <a href="#compania" class="block py-3 text-sm text-gray-400 hover:text-vp-gold transition">Compa&ntilde;&iacute;a</a>
-            <a href="#proceso" class="block py-3 text-sm text-gray-400 hover:text-vp-gold transition">Proceso</a>
-            <a href="#productos" class="block py-3 text-sm text-gray-400 hover:text-vp-gold transition">Productos</a>
-            <a href="#valor" class="block py-3 text-sm text-gray-400 hover:text-vp-gold transition">Por qu&eacute; ValPer</a>
-            <a href="#nosotros" class="block py-3 text-sm text-gray-400 hover:text-vp-gold transition">Socios</a>
-            <a href="#contacto" class="block mt-3 text-center py-3 border border-vp-gold/40 text-vp-gold text-sm font-bold uppercase tracking-wider">Contacto</a>
+        <div id="mobile-nav" class="hidden lg:hidden bg-white border-t border-vp-deep/10 px-6 pb-6">
+            <a href="#compania" class="block py-3 font-serif text-[15px] text-vp-deep/75 hover:text-vp-deep transition">Compa&ntilde;&iacute;a</a>
+            <a href="#proceso" class="block py-3 font-serif text-[15px] text-vp-deep/75 hover:text-vp-deep transition">Proceso</a>
+            <a href="#productos" class="block py-3 font-serif text-[15px] text-vp-deep/75 hover:text-vp-deep transition">Productos</a>
+            <a href="#valor" class="block py-3 font-serif text-[15px] text-vp-deep/75 hover:text-vp-deep transition">Por qu&eacute; ValPer</a>
+            <a href="#nosotros" class="block py-3 font-serif text-[15px] text-vp-deep/75 hover:text-vp-deep transition">Socios</a>
+            <a href="#contacto" class="block mt-3 text-center py-3 bg-vp-deep text-white font-serif text-[14px]">Contacto</a>
         </div>
     </header>
 
-    <!-- HERO -->
-    <section id="hero" class="relative h-screen flex items-center overflow-hidden">
-        <div class="absolute inset-0" style="background: radial-gradient(ellipse at 20% 50%, #2c2345 0%, #1a1433 40%, #0f0c18 80%);"></div>
-        <div class="absolute inset-0 opacity-[0.04]" style="background-image: linear-gradient(rgba(201,168,76,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.3) 1px, transparent 1px); background-size: 80px 80px;"></div>
+    <!-- HERO — light, split 2-col (JPMC sobriety) -->
+    <section id="hero" class="relative min-h-screen bg-white pt-32 md:pt-40 pb-0 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 md:px-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center min-h-[560px]">
+                <!-- Left: editorial content -->
+                <div class="lg:col-span-7 py-8">
+                    <h1 class="font-serif text-vp-deep font-normal leading-[1.02] tracking-[-0.02em] text-5xl md:text-6xl lg:text-[80px] mb-10" id="hero-title">
+                        Estructuraci&oacute;n de <em class="italic font-normal text-vp-gold">deuda y capital</em> para empresas mexicanas medianas y grandes.
+                    </h1>
+                    <p class="font-serif text-vp-soft text-lg md:text-xl leading-[1.55] max-w-xl mb-12 font-normal" id="hero-desc">
+                        Acompa&ntilde;amos a directores generales, CFOs y accionistas en la obtenci&oacute;n de financiamiento, desde el dise&ntilde;o hasta el cierre con bancos, fondos y otras fuentes institucionales.
+                    </p>
+                    <div class="flex items-center gap-8" id="hero-ctas">
+                        <a href="#contacto" class="inline-flex items-center bg-vp-deep text-white px-7 py-3.5 text-[15px] font-serif font-medium hover:bg-vp-purple transition duration-300">
+                            Hablemos de su transacci&oacute;n
+                        </a>
+                        <a href="#productos" class="font-serif text-[14px] text-vp-deep/75 hover:text-vp-deep border-b border-vp-deep/30 hover:border-vp-deep pb-1 transition duration-300">Ver soluciones &rarr;</a>
+                    </div>
+                </div>
 
-        <div class="relative z-10 max-w-6xl mx-auto px-6 md:px-12 w-full">
-            <div class="max-w-4xl">
-                <p class="text-vp-gold text-[11px] font-bold uppercase tracking-[5px] mb-8 overflow-hidden" id="hero-label">
-                    <span class="inline-block">ValPer &middot; Boutique de Banca de Inversi&oacute;n</span>
-                </p>
-                <h1 class="font-serif text-4xl md:text-6xl lg:text-[78px] font-normal text-white leading-[1.08] mb-10 max-w-3xl" id="hero-title">
-                    Estructuraci&oacute;n de <em class="text-vp-gold-light">deuda y capital</em> para empresas mexicanas medianas y grandes.
-                </h1>
-                <p class="text-gray-400 text-base md:text-lg leading-[1.7] max-w-xl mb-12" id="hero-desc">
-                    Acompa&ntilde;amos a directores generales, CFOs y accionistas en la obtenci&oacute;n de financiamiento, desde el dise&ntilde;o de la estructura hasta el cierre con bancos, fondos y otras fuentes institucionales.
-                </p>
-                <div class="flex flex-wrap items-center gap-8" id="hero-ctas">
-                    <a href="#contacto" class="inline-flex items-center gap-3 bg-vp-gold text-vp-deep px-8 py-4 text-[11px] font-bold uppercase tracking-[3px] hover:bg-vp-gold-light transition duration-500 group">
-                        <span>Hablemos de su transacci&oacute;n</span>
-                        <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                    </a>
-                    <a href="#productos" class="text-[11px] text-gray-400 hover:text-vp-gold uppercase tracking-[3px] font-bold transition duration-500">Ver soluciones &rarr;</a>
+                <!-- Right: image panel -->
+                <div class="lg:col-span-5">
+                    <div class="aspect-[4/5] bg-vp-cream relative overflow-hidden">
+                        <img src="images/cdmx-skyline-wide.jpg" alt="Ciudad de M&eacute;xico"
+                             class="w-full h-full object-cover"
+                             onerror="this.style.display='none'">
+                        <span class="absolute bottom-4 left-4 font-serif text-[11px] tracking-[0.22em] uppercase text-vp-deep/40">Ciudad de M&eacute;xico</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10" id="scroll-indicator">
-            <span class="text-[10px] text-gray-500 uppercase tracking-[3px]">Scroll</span>
-            <div class="w-[1px] h-12 bg-gradient-to-b from-vp-gold/60 to-transparent relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-4 bg-vp-gold animate-bounce"></div>
+        <!-- Bottom sector strip — hairline editorial band -->
+        <div class="border-t border-vp-deep/10 mt-16">
+            <div class="max-w-7xl mx-auto px-6 md:px-10 py-6 flex items-center justify-between gap-6 overflow-x-auto">
+                <div class="flex items-center gap-8 md:gap-12 text-vp-soft whitespace-nowrap font-serif text-[14px]">
+                    <span>Inmobiliario</span>
+                    <span class="hidden sm:inline">Industrial</span>
+                    <span>Agroalimentario</span>
+                    <span class="hidden md:inline">Financiero</span>
+                    <span class="hidden lg:inline">Hotelero</span>
+                    <span class="hidden lg:inline">Infraestructura</span>
+                </div>
+                <a href="#productos" class="shrink-0 font-serif text-[13px] text-vp-deep/75 hover:text-vp-deep border-b border-vp-deep/30 hover:border-vp-deep pb-0.5 transition duration-300 whitespace-nowrap">Nuestros sectores &rarr;</a>
             </div>
         </div>
     </section>
 
-    <!-- COMPA&Ntilde;&Iacute;A -->
-    <section id="compania" class="relative py-32 px-6 bg-vp-cream overflow-hidden">
-        <div class="max-w-5xl mx-auto relative z-10">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                <div>
-                    <p class="reveal text-vp-gold text-[12px] font-bold uppercase tracking-[5px] mb-5">Qui&eacute;nes Somos</p>
-                    <h2 class="reveal font-serif text-4xl md:text-5xl text-vp-deep leading-[1.15] mb-8">
-                        Boutique de <em class="text-vp-mid">banca de inversi&oacute;n</em>
+    <!-- COMPA&Ntilde;&Iacute;A + TRACK RECORD (fusionados, light, JPMC sobrio) -->
+    <section id="compania" class="relative bg-white text-vp-deep">
+        <!-- Intro editorial -->
+        <div class="max-w-7xl mx-auto px-6 md:px-10 pt-28 md:pt-36 pb-16">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                <div class="lg:col-span-5">
+                    <p class="reveal text-vp-soft text-[11px] font-medium uppercase tracking-[0.22em] mb-6">Qui&eacute;nes Somos</p>
+                    <h2 class="reveal font-serif text-4xl md:text-5xl lg:text-6xl text-vp-deep leading-[1.05] tracking-[-0.02em] mb-0">
+                        Boutique de <em class="italic font-normal text-vp-gold">banca de inversi&oacute;n.</em>
                     </h2>
-                    <div class="reveal w-12 h-[2px] bg-vp-gold mb-8"></div>
-                    <p class="reveal text-gray-600 text-[17px] leading-[1.9] mb-6">
-                        <strong class="text-vp-deep">ValPer</strong> es una boutique de banca de inversi&oacute;n especializada en la estructuraci&oacute;n de recursos financieros &mdash;en forma de capital y/o deuda&mdash; para impulsar el crecimiento econ&oacute;mico de empresas grandes y medianas en diferentes sectores econ&oacute;micos.
-                    </p>
-                    <p class="reveal text-gray-600 text-[17px] leading-[1.9]">
-                        Acompa&ntilde;amos a nuestros clientes de manera cercana y estrat&eacute;gica durante todo el proceso de obtenci&oacute;n de los recursos financieros, con relaciones s&oacute;lidas con las principales fuentes de fondeo nacionales e internacionales.
-                    </p>
-                    <div class="reveal mt-8 flex flex-wrap gap-2">
-                        <span class="text-[11px] font-bold uppercase tracking-[2px] text-vp-mid border border-vp-mid/20 px-3 py-1.5">Inmobiliario</span>
-                        <span class="text-[11px] font-bold uppercase tracking-[2px] text-vp-mid border border-vp-mid/20 px-3 py-1.5">Industrial</span>
-                        <span class="text-[11px] font-bold uppercase tracking-[2px] text-vp-mid border border-vp-mid/20 px-3 py-1.5">Agroalimentario</span>
-                        <span class="text-[11px] font-bold uppercase tracking-[2px] text-vp-mid border border-vp-mid/20 px-3 py-1.5">Financiero</span>
-                    </div>
                 </div>
-                <div class="reveal-right">
-                    <div class="bg-white shadow-xl shadow-vp-mid/5 p-10 relative border border-gray-100">
-                        <div class="absolute top-0 left-0 w-full h-[2px] bg-vp-gold"></div>
-                        <div class="space-y-8">
-                            <div>
-                                <p class="font-serif text-5xl text-vp-deep">+<span class="stat-value" data-target="50">0</span></p>
-                                <p class="text-[13px] uppercase tracking-[2px] text-gray-400 mt-1">A&ntilde;os de experiencia combinada</p>
-                            </div>
-                            <div class="h-[1px] bg-gray-100"></div>
-                            <div>
-                                <p class="font-serif text-5xl text-vp-deep">+$<span class="stat-value" data-target="2000">0</span>M <span class="text-2xl text-gray-400">USD</span></p>
-                                <p class="text-[13px] uppercase tracking-[2px] text-gray-400 mt-1">En operaciones de financiamiento</p>
-                            </div>
-                            <div class="h-[1px] bg-gray-100"></div>
-                            <div>
-                                <p class="font-serif text-5xl text-vp-deep stat-value" data-target="4">0</p>
-                                <p class="text-[13px] uppercase tracking-[2px] text-gray-400 mt-1">Socios con trayectoria internacional</p>
-                            </div>
-                        </div>
-                    </div>
+                <div class="lg:col-span-6 lg:col-start-7 flex flex-col gap-6 justify-end">
+                    <p class="reveal font-serif text-vp-deep/85 text-[17px] leading-[1.7]">
+                        <strong class="font-medium text-vp-deep">ValPer</strong> es una boutique de banca de inversi&oacute;n especializada en la estructuraci&oacute;n de recursos financieros &mdash;en forma de capital y/o deuda&mdash; para impulsar el crecimiento econ&oacute;mico de empresas grandes y medianas en diferentes sectores econ&oacute;micos.
+                    </p>
                 </div>
             </div>
         </div>
-    </section>
 
-    <!-- CREDENCIALES (sobrio, sin marquee) -->
-    <section id="credenciales" class="relative py-24 bg-vp-deep">
-        <div class="max-w-6xl mx-auto px-6">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-                <div class="lg:col-span-4">
-                    <p class="reveal text-vp-gold text-[10px] font-bold uppercase tracking-[4px] mb-5">Track Record</p>
-                    <h2 class="reveal font-serif text-3xl md:text-4xl text-white leading-[1.2] mb-6">Una trayectoria <em class="text-vp-gold-light">verificable</em>.</h2>
-                    <p class="reveal text-gray-400 text-[15px] leading-[1.8]">Cifras y experiencia acumulada de los socios y colaboradores a lo largo de su carrera en el sistema financiero nacional e internacional.</p>
+        <!-- Track record — tabla de stats Harvey, light -->
+        <div class="max-w-7xl mx-auto px-6 md:px-10 pb-28 md:pb-36">
+            <p class="reveal text-vp-soft text-[11px] font-medium uppercase tracking-[0.22em] mb-10">Track Record</p>
+            <div class="border-t border-vp-deep/15">
+                <div class="reveal grid grid-cols-12 gap-6 items-center py-8 md:py-10 border-b border-vp-deep/15">
+                    <p class="col-span-12 sm:col-span-7 font-serif text-vp-soft text-[15px] md:text-[17px]">A&ntilde;os de experiencia combinada</p>
+                    <p class="col-span-12 sm:col-span-5 font-serif text-vp-deep text-5xl md:text-6xl lg:text-7xl font-normal text-left sm:text-right num">+<span class="stat-value" data-target="50">0</span></p>
                 </div>
-                <div class="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/10">
-                    <div class="reveal py-6 sm:py-2 sm:pr-8">
-                        <p class="font-serif text-4xl md:text-5xl text-white">+$<span class="stat-value" data-target="2000">0</span><span class="text-vp-gold text-xl ml-1">M</span></p>
-                        <p class="text-[10px] uppercase tracking-[3px] text-vp-gold/80 mt-3">USD en operaciones de financiamiento</p>
-                    </div>
-                    <div class="reveal py-6 sm:py-2 sm:px-8">
-                        <p class="font-serif text-4xl md:text-5xl text-white">+<span class="stat-value" data-target="50">0</span></p>
-                        <p class="text-[10px] uppercase tracking-[3px] text-vp-gold/80 mt-3">A&ntilde;os de experiencia combinada</p>
-                    </div>
-                    <div class="reveal py-6 sm:py-2 sm:pl-8">
-                        <p class="font-serif text-4xl md:text-5xl text-white"><span class="stat-value" data-target="4">0</span></p>
-                        <p class="text-[10px] uppercase tracking-[3px] text-vp-gold/80 mt-3">Sectores principales atendidos</p>
-                    </div>
+                <div class="reveal grid grid-cols-12 gap-6 items-center py-8 md:py-10 border-b border-vp-deep/15">
+                    <p class="col-span-12 sm:col-span-7 font-serif text-vp-soft text-[15px] md:text-[17px]">USD en operaciones de financiamiento estructuradas</p>
+                    <p class="col-span-12 sm:col-span-5 font-serif text-vp-deep text-5xl md:text-6xl lg:text-7xl font-normal text-left sm:text-right num">+$<span class="stat-value" data-target="2000">0</span>M</p>
+                </div>
+                <div class="reveal grid grid-cols-12 gap-6 items-center py-8 md:py-10 border-b border-vp-deep/15">
+                    <p class="col-span-12 sm:col-span-7 font-serif text-vp-soft text-[15px] md:text-[17px]">Socios con trayectoria internacional</p>
+                    <p class="col-span-12 sm:col-span-5 font-serif text-vp-deep text-5xl md:text-6xl lg:text-7xl font-normal text-left sm:text-right num"><span class="stat-value" data-target="4">0</span></p>
+                </div>
+                <div class="reveal grid grid-cols-12 gap-6 items-center py-8 md:py-10 border-b border-vp-deep/15">
+                    <p class="col-span-12 sm:col-span-7 font-serif text-vp-soft text-[15px] md:text-[17px]">Sectores econ&oacute;micos principales</p>
+                    <p class="col-span-12 sm:col-span-5 font-serif text-vp-deep text-5xl md:text-6xl lg:text-7xl font-normal text-left sm:text-right num"><span class="stat-value" data-target="4">0</span></p>
+                </div>
+                <div class="reveal grid grid-cols-12 gap-6 items-center py-8 md:py-10 border-b border-vp-deep/15">
+                    <p class="col-span-12 sm:col-span-7 font-serif text-vp-soft text-[15px] md:text-[17px]">Esquemas diferenciados de financiamiento</p>
+                    <p class="col-span-12 sm:col-span-5 font-serif text-vp-deep text-5xl md:text-6xl lg:text-7xl font-normal text-left sm:text-right num"><span class="stat-value" data-target="8">0</span></p>
                 </div>
             </div>
         </div>
@@ -261,7 +259,7 @@
         <div class="max-w-6xl mx-auto">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
                 <div class="lg:col-span-5">
-                    <p class="reveal text-vp-gold text-[10px] font-bold uppercase tracking-[4px] mb-5">Proceso de Ejecuci&oacute;n</p>
+                    <p class="reveal text-vp-soft text-[11px] font-medium uppercase tracking-[0.22em] mb-6">Proceso de Ejecuci&oacute;n</p>
                     <h2 class="reveal font-serif text-4xl md:text-5xl text-vp-deep leading-[1.15]">C&oacute;mo trabajamos.</h2>
                 </div>
                 <div class="lg:col-span-7 flex items-end">
@@ -271,7 +269,7 @@
 
             <ol class="border-t border-vp-deep/10">
                 <li class="reveal grid grid-cols-12 gap-8 py-10 border-b border-vp-deep/10 group">
-                    <div class="col-span-12 md:col-span-1 font-serif text-2xl text-vp-gold">01</div>
+                    <div class="col-span-12 md:col-span-1 font-serif text-2xl text-vp-soft">01</div>
                     <div class="col-span-12 md:col-span-3">
                         <h3 class="font-serif text-2xl text-vp-deep leading-[1.2]">Debida Diligencia</h3>
                         <p class="text-[11px] uppercase tracking-[2px] text-gray-400 mt-2">Due Diligence</p>
@@ -281,7 +279,7 @@
                     </div>
                 </li>
                 <li class="reveal grid grid-cols-12 gap-8 py-10 border-b border-vp-deep/10 group">
-                    <div class="col-span-12 md:col-span-1 font-serif text-2xl text-vp-gold">02</div>
+                    <div class="col-span-12 md:col-span-1 font-serif text-2xl text-vp-soft">02</div>
                     <div class="col-span-12 md:col-span-3">
                         <h3 class="font-serif text-2xl text-vp-deep leading-[1.2]">Memorando Informativo</h3>
                         <p class="text-[11px] uppercase tracking-[2px] text-gray-400 mt-2">Information Memo</p>
@@ -291,7 +289,7 @@
                     </div>
                 </li>
                 <li class="reveal grid grid-cols-12 gap-8 py-10 border-b border-vp-deep/10 group">
-                    <div class="col-span-12 md:col-span-1 font-serif text-2xl text-vp-gold">03</div>
+                    <div class="col-span-12 md:col-span-1 font-serif text-2xl text-vp-soft">03</div>
                     <div class="col-span-12 md:col-span-3">
                         <h3 class="font-serif text-2xl text-vp-deep leading-[1.2]">Acceso al Mercado</h3>
                         <p class="text-[11px] uppercase tracking-[2px] text-gray-400 mt-2">Market Access</p>
@@ -301,7 +299,7 @@
                     </div>
                 </li>
                 <li class="reveal grid grid-cols-12 gap-8 py-10 border-b border-vp-deep/10 group">
-                    <div class="col-span-12 md:col-span-1 font-serif text-2xl text-vp-gold">04</div>
+                    <div class="col-span-12 md:col-span-1 font-serif text-2xl text-vp-soft">04</div>
                     <div class="col-span-12 md:col-span-3">
                         <h3 class="font-serif text-2xl text-vp-deep leading-[1.2]">Obtenci&oacute;n de Propuestas</h3>
                         <p class="text-[11px] uppercase tracking-[2px] text-gray-400 mt-2">Term Sheets</p>
@@ -311,7 +309,7 @@
                     </div>
                 </li>
                 <li class="reveal grid grid-cols-12 gap-8 py-10 border-b border-vp-deep/10 group">
-                    <div class="col-span-12 md:col-span-1 font-serif text-2xl text-vp-gold">05</div>
+                    <div class="col-span-12 md:col-span-1 font-serif text-2xl text-vp-soft">05</div>
                     <div class="col-span-12 md:col-span-3">
                         <h3 class="font-serif text-2xl text-vp-deep leading-[1.2]">Cierre y Disposici&oacute;n</h3>
                         <p class="text-[11px] uppercase tracking-[2px] text-gray-400 mt-2">Closing</p>
@@ -325,7 +323,7 @@
             <!-- Cierre editorial: Honorario de &eacute;xito -->
             <div class="reveal mt-16 grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
                 <div class="md:col-span-3">
-                    <p class="text-[10px] uppercase tracking-[4px] text-vp-gold font-bold">Honorarios</p>
+                    <p class="text-[11px] uppercase tracking-[0.22em] text-vp-soft font-medium">Honorarios</p>
                 </div>
                 <div class="md:col-span-9">
                     <p class="font-serif text-2xl md:text-3xl text-vp-deep leading-[1.35]">Cobramos un <em class="text-vp-mid">honorario de &eacute;xito</em> &mdash;un porcentaje del monto financiero obtenido&mdash; acordado por escrito en una carta mandato antes de iniciar el proceso.</p>
@@ -339,7 +337,7 @@
         <div class="max-w-6xl mx-auto">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
                 <div class="lg:col-span-5">
-                    <p class="reveal text-vp-gold text-[10px] font-bold uppercase tracking-[4px] mb-5">Soluciones</p>
+                    <p class="reveal text-vp-soft text-[11px] font-medium uppercase tracking-[0.22em] mb-6">Soluciones</p>
                     <h2 class="reveal font-serif text-4xl md:text-5xl text-vp-deep leading-[1.15]">Tres pr&aacute;cticas, ocho instrumentos.</h2>
                 </div>
                 <div class="lg:col-span-7 flex items-end">
@@ -350,18 +348,18 @@
             <!-- Diagrama de productos (rueda del PDF, estilo card sec 2) -->
             <div class="reveal mb-24 max-w-4xl mx-auto">
                 <div class="bg-white shadow-xl shadow-vp-mid/5 border border-gray-100 relative p-10 md:p-16">
-                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-vp-gold via-vp-mid to-vp-gold"></div>
-                    <p class="text-center text-vp-gold text-[10px] font-bold uppercase tracking-[4px] mb-2">Esquemas Diferenciados</p>
+                    <div class="absolute top-0 left-0 w-full h-px bg-vp-deep/15"></div>
+                    <p class="text-center text-vp-soft text-[11px] font-medium uppercase tracking-[0.22em] mb-2">Esquemas Diferenciados</p>
                     <p class="text-center font-serif text-2xl md:text-3xl text-vp-deep leading-[1.3] max-w-xl mx-auto mb-12">En nuestras soluciones manejamos los siguientes esquemas para la <em class="text-vp-mid">obtenci&oacute;n de recursos</em>.</p>
 
                     <div class="relative mx-auto" style="max-width: 620px;">
                         <svg viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
                             <!-- Anillos sutiles -->
-                            <circle cx="400" cy="400" r="265" fill="none" stroke="#1a1433" stroke-opacity="0.05" stroke-width="1" stroke-dasharray="2 6"/>
-                            <circle cx="400" cy="400" r="175" fill="none" stroke="#c9a84c" stroke-opacity="0.25" stroke-width="0.75"/>
+                            <circle cx="400" cy="400" r="265" fill="none" stroke="#0E1A2B" stroke-opacity="0.05" stroke-width="1" stroke-dasharray="2 6"/>
+                            <circle cx="400" cy="400" r="175" fill="none" stroke="#2E8B62" stroke-opacity="0.25" stroke-width="0.75"/>
 
                             <!-- L&iacute;neas hacia cada producto -->
-                            <g stroke="#1a1433" stroke-opacity="0.1" stroke-width="0.75">
+                            <g stroke="#0E1A2B" stroke-opacity="0.1" stroke-width="0.75">
                                 <line x1="400" y1="225" x2="400" y2="135"/>
                                 <line x1="524" y1="276" x2="588" y2="212"/>
                                 <line x1="575" y1="400" x2="665" y2="400"/>
@@ -373,7 +371,7 @@
                             </g>
 
                             <!-- Puntos dorados -->
-                            <g fill="#c9a84c">
+                            <g fill="#2E8B62">
                                 <circle cx="400" cy="225" r="5"/>
                                 <circle cx="524" cy="276" r="5"/>
                                 <circle cx="575" cy="400" r="5"/>
@@ -385,25 +383,25 @@
                             </g>
 
                             <!-- Centro: c&iacute;rculo deep con tipo serif italic -->
-                            <circle cx="400" cy="400" r="115" fill="#1a1433"/>
+                            <circle cx="400" cy="400" r="115" fill="#0E1A2B"/>
                             <text x="400" y="392" text-anchor="middle" font-family="Playfair Display, serif" font-size="34" fill="#ffffff" font-style="italic">Productos</text>
-                            <line x1="375" y1="408" x2="425" y2="408" stroke="#c9a84c" stroke-width="0.75"/>
-                            <text x="400" y="430" text-anchor="middle" font-family="PT Sans, sans-serif" font-size="9" fill="#c9a84c" letter-spacing="4">VALPER</text>
+                            <line x1="375" y1="408" x2="425" y2="408" stroke="#2E8B62" stroke-width="0.75"/>
+                            <text x="400" y="430" text-anchor="middle" font-family="PT Sans, sans-serif" font-size="9" fill="#2E8B62" letter-spacing="4">VALPER</text>
 
                             <!-- Labels - Playfair para nombres -->
-                            <text x="400" y="115" text-anchor="middle" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Cr&#233;ditos Sindicados</text>
-                            <text x="610" y="200" text-anchor="start" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Arrendamiento S&amp;LB</text>
-                            <text x="688" y="396" text-anchor="start" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Asset-Based</text>
-                            <text x="688" y="416" text-anchor="start" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Lending</text>
-                            <text x="610" y="605" text-anchor="start" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Factoraje</text>
-                            <text x="610" y="625" text-anchor="start" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Clientes / Proveedores</text>
-                            <text x="400" y="700" text-anchor="middle" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Factoraje Internacional</text>
-                            <text x="190" y="605" text-anchor="end" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Refinanciamiento</text>
-                            <text x="190" y="625" text-anchor="end" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">de Deuda</text>
-                            <text x="112" y="396" text-anchor="end" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Cr&#233;ditos</text>
-                            <text x="112" y="416" text-anchor="end" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">a la Medida</text>
-                            <text x="190" y="200" text-anchor="end" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">Hoteles, Infraestructura</text>
-                            <text x="190" y="220" text-anchor="end" font-family="Playfair Display, serif" font-size="17" fill="#1a1433">e Inmobiliario</text>
+                            <text x="400" y="115" text-anchor="middle" font-family="Playfair Display, serif" font-size="17" fill="#0E1A2B">Cr&#233;ditos Sindicados</text>
+                            <text x="610" y="200" text-anchor="start" font-family="Playfair Display, serif" font-size="17" fill="#0E1A2B">Arrendamiento S&amp;LB</text>
+                            <text x="688" y="396" text-anchor="start" font-family="Playfair Display, serif" font-size="17" fill="#0E1A2B">Asset-Based</text>
+                            <text x="688" y="416" text-anchor="start" font-family="Playfair Display, serif" font-size="17" fill="#0E1A2B">Lending</text>
+                            <text x="610" y="605" text-anchor="start" font-family="Playfair Display, serif" font-size="17" fill="#0E1A2B">Factoraje</text>
+                            <text x="610" y="625" text-anchor="start" font-family="Playfair Display, serif" font-size="17" fill="#0E1A2B">Clientes / Proveedores</text>
+                            <text x="400" y="700" text-anchor="middle" font-family="Playfair Display, serif" font-size="17" fill="#0E1A2B">Factoraje Internacional</text>
+                            <text x="190" y="605" text-anchor="end" font-family="Playfair Display, serif" font-size="17" fill="#0E1A2B">Refinanciamiento</text>
+                            <text x="190" y="625" text-anchor="end" font-family="Playfair Display, serif" font-size="17" fill="#0E1A2B">de Deuda</text>
+                            <text x="112" y="396" text-anchor="end" font-family="Playfair Display, serif" font-size="17" fill="#0E1A2B">Cr&#233;ditos</text>
+                            <text x="112" y="416" text-anchor="end" font-family="Playfair Display, serif" font-size="17" fill="#0E1A2B">a la Medida</text>
+                            <text x="190" y="200" text-anchor="end" font-family="Playfair Display, serif" font-size="17" fill="#0E1A2B">Hoteles, Infraestructura</text>
+                            <text x="190" y="220" text-anchor="end" font-family="Playfair Display, serif" font-size="17" fill="#0E1A2B">e Inmobiliario</text>
                         </svg>
                     </div>
                 </div>
@@ -412,7 +410,7 @@
             <!-- Caracter&iacute;sticas (l&iacute;nea editorial sobria) -->
             <div class="reveal grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 <div class="lg:col-span-3">
-                    <p class="text-[10px] uppercase tracking-[4px] text-vp-gold font-bold mb-3">Caracter&iacute;sticas</p>
+                    <p class="text-[11px] uppercase tracking-[0.22em] text-vp-soft font-medium mb-3">Caracter&iacute;sticas</p>
                     <h3 class="font-serif text-2xl text-vp-deep leading-tight">Estructura flexible.</h3>
                 </div>
                 <div class="lg:col-span-9 grid grid-cols-2 md:grid-cols-4 gap-px bg-vp-deep/10 border border-vp-deep/10">
@@ -442,7 +440,7 @@
         <div class="max-w-6xl mx-auto">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16">
                 <div class="lg:col-span-5">
-                    <p class="reveal text-vp-gold text-[10px] font-bold uppercase tracking-[4px] mb-5">Foco Sectorial</p>
+                    <p class="reveal text-vp-soft text-[11px] font-medium uppercase tracking-[0.22em] mb-6">Foco Sectorial</p>
                     <h2 class="reveal font-serif text-4xl md:text-5xl text-vp-deep leading-[1.15]">Sector <em class="text-vp-mid">Inmobiliario</em>.</h2>
                 </div>
                 <div class="lg:col-span-7 flex items-end">
@@ -453,18 +451,18 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
                 <!-- Plazos -->
                 <div class="reveal lg:col-span-5">
-                    <p class="text-[10px] uppercase tracking-[4px] text-vp-gold font-bold mb-6">Esquemas de amortizaci&oacute;n a largo plazo</p>
+                    <p class="text-[11px] uppercase tracking-[0.22em] text-vp-soft font-medium mb-6">Esquemas de amortizaci&oacute;n a largo plazo</p>
                     <div class="flex items-end gap-8 font-serif">
                         <div>
                             <span class="text-5xl text-vp-deep block">20</span>
                             <span class="text-[10px] uppercase tracking-[2px] text-gray-400 mt-1 block">a&ntilde;os</span>
                         </div>
-                        <span class="text-vp-gold/40 text-2xl pb-2">/</span>
+                        <span class="text-vp-deep/20 text-2xl pb-2">/</span>
                         <div>
                             <span class="text-5xl text-vp-deep block">25</span>
                             <span class="text-[10px] uppercase tracking-[2px] text-gray-400 mt-1 block">a&ntilde;os</span>
                         </div>
-                        <span class="text-vp-gold/40 text-2xl pb-2">/</span>
+                        <span class="text-vp-deep/20 text-2xl pb-2">/</span>
                         <div>
                             <span class="text-5xl text-vp-deep block">30</span>
                             <span class="text-[10px] uppercase tracking-[2px] text-gray-400 mt-1 block">a&ntilde;os</span>
@@ -475,7 +473,7 @@
 
                 <!-- Tipolog&iacute;as -->
                 <div class="reveal lg:col-span-7">
-                    <p class="text-[10px] uppercase tracking-[4px] text-vp-gold font-bold mb-6">Tipolog&iacute;as financiables</p>
+                    <p class="text-[11px] uppercase tracking-[0.22em] text-vp-soft font-medium mb-6">Tipolog&iacute;as financiables</p>
                     <div class="border-t border-vp-deep/10">
                         <div class="grid grid-cols-12 gap-4 py-5 border-b border-vp-deep/10">
                             <div class="col-span-4 font-serif text-vp-deep text-lg">Naves Industriales</div>
@@ -504,7 +502,7 @@
         <div class="max-w-6xl mx-auto">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16">
                 <div class="lg:col-span-5">
-                    <p class="reveal text-vp-gold text-[10px] font-bold uppercase tracking-[4px] mb-5">Por qu&eacute; ValPer</p>
+                    <p class="reveal text-vp-soft text-[11px] font-medium uppercase tracking-[0.22em] mb-6">Por qu&eacute; ValPer</p>
                     <h2 class="reveal font-serif text-4xl md:text-5xl text-vp-deep leading-[1.15]">Una mesa con red, criterio y oficio.</h2>
                 </div>
                 <div class="lg:col-span-7 flex items-end">
@@ -514,17 +512,17 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-vp-deep/10 border border-vp-deep/10">
                 <div class="reveal bg-white p-8">
-                    <p class="font-serif text-3xl text-vp-gold mb-4">01</p>
+                    <p class="font-serif text-3xl text-vp-soft mb-4">01</p>
                     <h3 class="font-serif text-xl text-vp-deep mb-3 leading-[1.25]">Entendemos el negocio.</h3>
                     <p class="text-[14px] text-gray-600 leading-[1.85]">Antes de estructurar, escuchamos. El Due Diligence no es un check-list: es la base de una soluci&oacute;n a la medida.</p>
                 </div>
                 <div class="reveal bg-white p-8" style="transition-delay: 0.05s;">
-                    <p class="font-serif text-3xl text-vp-gold mb-4">02</p>
+                    <p class="font-serif text-3xl text-vp-soft mb-4">02</p>
                     <h3 class="font-serif text-xl text-vp-deep mb-3 leading-[1.25]">Red institucional amplia.</h3>
                     <p class="text-[14px] text-gray-600 leading-[1.85]">Acceso a deuda y capital en M&eacute;xico y en el extranjero. Las condiciones que conseguimos reflejan el perfil real del cliente, no el del producto disponible.</p>
                 </div>
                 <div class="reveal bg-white p-8" style="transition-delay: 0.1s;">
-                    <p class="font-serif text-3xl text-vp-gold mb-4">03</p>
+                    <p class="font-serif text-3xl text-vp-soft mb-4">03</p>
                     <h3 class="font-serif text-xl text-vp-deep mb-3 leading-[1.25]">Servicio directo de socio.</h3>
                     <p class="text-[14px] text-gray-600 leading-[1.85]">El cliente trata directamente con un socio responsable de la operaci&oacute;n. Sin intermediarios, sin ruido, sin desgaste innecesario.</p>
                 </div>
@@ -534,187 +532,158 @@
         </div>
     </section>
 
-    <!-- MISION / VISION / VALORES -->
-    <section class="relative py-32 px-6 overflow-hidden" style="background: radial-gradient(ellipse at 30% 50%, #2c2345, #1a1433 60%, #0f0c18);">
-        <div class="absolute inset-0 opacity-[0.03]" style="background-image: linear-gradient(rgba(201,168,76,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.4) 1px, transparent 1px); background-size: 60px 60px;"></div>
-
-        <div class="relative z-10 max-w-5xl mx-auto text-center">
-            <div class="reveal-scale">
-                <p class="text-vp-gold text-[12px] font-bold uppercase tracking-[5px] mb-10">Nuestro Prop&oacute;sito</p>
-                <div class="flex items-center justify-center mb-8 gap-4">
-                    <span class="h-px w-16 bg-vp-gold/40"></span>
-                    <svg class="w-5 h-5 text-vp-gold/70" fill="currentColor" viewBox="0 0 24 24"><path d="M9 7H7a4 4 0 00-4 4v4h6V11H7a2 2 0 012-2V7zm10 0h-2a4 4 0 00-4 4v4h6V11h-2a2 2 0 012-2V7z"/></svg>
-                    <span class="h-px w-16 bg-vp-gold/40"></span>
+    <!-- MISION / VISION / VALORES — editorial light -->
+    <section class="relative py-28 md:py-36 px-6 md:px-10 bg-vp-cream">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-16">
+                <div class="lg:col-span-3">
+                    <p class="reveal text-vp-soft text-[11px] font-medium uppercase tracking-[0.22em]">Misi&oacute;n</p>
                 </div>
-                <blockquote class="font-serif text-2xl md:text-4xl lg:text-5xl text-white leading-[1.35] mb-12 px-4">
-                    Impulsar el crecimiento econ&oacute;mico de medianas y grandes empresas, mediante la estructuraci&oacute;n de soluciones financieras, <em class="text-vp-gold-light">en condiciones competitivas, de manera r&aacute;pida y confiable.</em>
-                </blockquote>
-                <p class="text-[11px] font-bold uppercase tracking-[5px] text-gray-500">&mdash; Misi&oacute;n ValPer</p>
+                <div class="lg:col-span-9">
+                    <blockquote class="reveal font-serif text-vp-deep text-3xl md:text-4xl lg:text-5xl leading-[1.2] tracking-[-0.02em] font-normal">
+                        Impulsar el crecimiento econ&oacute;mico de medianas y grandes empresas, mediante la estructuraci&oacute;n de soluciones financieras, <em class="italic font-normal text-vp-gold">en condiciones competitivas, de manera r&aacute;pida y confiable.</em>
+                    </blockquote>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-white/5 mt-24">
-                <div class="reveal-left glass p-10 text-left">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-8 h-[2px] bg-vp-gold"></div>
-                        <h3 class="text-[11px] font-bold uppercase tracking-[3px] text-vp-gold">Visi&oacute;n</h3>
-                    </div>
-                    <p class="font-serif text-white text-2xl leading-[1.35]">Ser la boutique de banca de inversi&oacute;n m&aacute;s <em class="text-vp-gold-light">confiable y efectiva</em> de M&eacute;xico.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 pt-12 border-t border-vp-deep/15">
+                <div class="lg:col-span-3">
+                    <p class="reveal text-vp-soft text-[11px] font-medium uppercase tracking-[0.22em]">Visi&oacute;n</p>
                 </div>
-                <div class="reveal-right glass p-10 text-left">
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-8 h-[2px] bg-vp-gold"></div>
-                        <h3 class="text-[11px] font-bold uppercase tracking-[3px] text-vp-gold">Valores</h3>
-                    </div>
-                    <div class="flex flex-wrap gap-x-5 gap-y-2 text-gray-300 text-[14px] font-serif">
-                        <span>Experiencia</span><span class="text-vp-gold/40">&middot;</span>
-                        <span>Honestidad</span><span class="text-vp-gold/40">&middot;</span>
-                        <span>Tenacidad</span><span class="text-vp-gold/40">&middot;</span>
-                        <span>Confianza</span><span class="text-vp-gold/40">&middot;</span>
-                        <span>Integridad</span><span class="text-vp-gold/40">&middot;</span>
-                        <span>Confidencialidad</span><span class="text-vp-gold/40">&middot;</span>
-                        <span>Trazabilidad</span><span class="text-vp-gold/40">&middot;</span>
-                        <span>Compromiso</span>
-                    </div>
+                <div class="lg:col-span-9">
+                    <p class="reveal font-serif text-vp-deep text-xl md:text-2xl leading-[1.4]">Ser la boutique de banca de inversi&oacute;n m&aacute;s <em class="italic font-normal text-vp-gold">confiable y efectiva</em> de M&eacute;xico.</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 pt-12 mt-12 border-t border-vp-deep/15">
+                <div class="lg:col-span-3">
+                    <p class="reveal text-vp-soft text-[11px] font-medium uppercase tracking-[0.22em]">Valores</p>
+                </div>
+                <div class="lg:col-span-9">
+                    <p class="reveal font-serif text-vp-deep text-xl md:text-2xl leading-[1.6]">
+                        Experiencia &middot; Honestidad &middot; Tenacidad &middot; Confianza &middot; Integridad &middot; Confidencialidad &middot; Trazabilidad &middot; Compromiso<span class="text-vp-gold">.</span>
+                    </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- NOSOTROS (4 Socios — editorial, slots para fotos) -->
-    <section id="nosotros" class="relative py-32 px-6 bg-white">
-        <div class="max-w-6xl mx-auto">
+    <!-- NOSOTROS (4 Socios — testimonio Harvey: retrato izq, quote der, nombre, marca distintiva) -->
+    <section id="nosotros" class="relative py-28 md:py-36 px-6 md:px-10 bg-vp-smoke">
+        <div class="max-w-7xl mx-auto">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
                 <div class="lg:col-span-5">
-                    <p class="reveal text-vp-gold text-[10px] font-bold uppercase tracking-[4px] mb-5">Socios</p>
-                    <h2 class="reveal font-serif text-4xl md:text-5xl text-vp-deep leading-[1.15]">Cuatro socios. <em class="text-vp-mid">Una mesa.</em></h2>
+                    <p class="reveal text-vp-soft text-[11px] font-medium uppercase tracking-[0.22em] mb-6">Socios</p>
+                    <h2 class="reveal font-serif text-4xl md:text-5xl lg:text-6xl text-vp-deep leading-[1.05] tracking-[-0.02em]">Cuatro socios. <em class="italic font-normal text-vp-gold">Una mesa.</em></h2>
                 </div>
-                <div class="lg:col-span-7 flex items-end">
-                    <p class="reveal text-gray-600 text-[16px] leading-[1.85] max-w-2xl">M&aacute;s de 50 a&ntilde;os combinados en banca corporativa, banca de inversi&oacute;n y direcci&oacute;n general. Trayectorias en HSBC, Rabobank, American Express Bank, Banco Finterra y la CNBV.</p>
+                <div class="lg:col-span-6 lg:col-start-7 flex items-end">
+                    <p class="reveal font-serif text-vp-soft text-[17px] leading-[1.7] max-w-2xl">M&aacute;s de 50 a&ntilde;os combinados en banca corporativa, banca de inversi&oacute;n y direcci&oacute;n general. Trayectorias en HSBC, Rabobank, American Express Bank, Banco Finterra y la CNBV.</p>
                 </div>
             </div>
 
-            <div class="border-t border-vp-deep/10">
+            <div class="space-y-12 md:space-y-16">
 
                 <!-- Socio 1: Jos&eacute; Antonio P&eacute;rez -->
-                <article class="reveal grid grid-cols-1 lg:grid-cols-12 gap-8 py-14 border-b border-vp-deep/10">
-                    <div class="lg:col-span-3">
-                        <div class="aspect-[4/5] bg-vp-smoke border border-vp-deep/10 overflow-hidden">
-                            <img src="https://www.valper.mx/img/team/team2_1.jpg" alt="Jos&eacute; Antonio P&eacute;rez - Socio Fundador de ValPer" class="w-full h-full object-cover object-top grayscale hover:grayscale-0 transition duration-700"
-                                 onerror="this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center relative\'><span class=\'font-serif text-7xl text-vp-deep/15\'>JAP</span><span class=\'absolute bottom-3 left-3 text-[9px] uppercase tracking-[2px] text-gray-400\'>Foto pendiente</span></div>';">
+                <article class="reveal grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-stretch">
+                    <div class="lg:col-span-5">
+                        <div class="aspect-[5/4] bg-vp-cream relative overflow-hidden border border-vp-deep/10">
+                            <img src="images/socio-jap.jpg" alt="Jos&eacute; Antonio P&eacute;rez - Socio Fundador de ValPer"
+                                 class="w-full h-full object-cover object-top"
+                                 onerror="this.style.display='none'">
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <span class="font-serif text-[100px] md:text-[140px] text-vp-deep/12 font-light">JAP</span>
+                            </div>
+                            <span class="absolute bottom-4 left-4 font-serif text-[10px] uppercase tracking-[0.22em] text-vp-deep/35">Foto pendiente</span>
                         </div>
                     </div>
-                    <div class="lg:col-span-4">
-                        <p class="text-[10px] uppercase tracking-[4px] text-vp-gold font-bold mb-3">Socio Fundador</p>
-                        <h3 class="font-serif text-3xl text-vp-deep mb-4 leading-[1.1]">Jos&eacute; Antonio P&eacute;rez</h3>
-                        <p class="text-[14px] text-gray-600 leading-[1.85]">+25 a&ntilde;os en el sector financiero. <strong class="text-vp-deep">~USD $1,200M</strong> en arrendamiento y cr&eacute;ditos corporativos. Experto en arrendamiento industrial y desarrollo de entidades financieras (SOFOL a banco).</p>
-                        <p class="text-[11px] uppercase tracking-[2px] text-gray-400 mt-5">MBA, Kent Business School</p>
-                    </div>
-                    <div class="lg:col-span-5">
-                        <p class="text-[10px] uppercase tracking-[3px] text-gray-400 font-bold mb-3">Trayectoria</p>
-                        <ul class="space-y-1.5 text-[13px] text-gray-600">
-                            <li>VP Banca Corporativa &mdash; <span class="text-vp-deep">Rabobank International</span></li>
-                            <li>Director Comercial &mdash; <span class="text-vp-deep">SQN Latina</span></li>
-                            <li>Director Comercial &mdash; <span class="text-vp-deep">Bankaool</span></li>
-                            <li>Director Comercial &mdash; <span class="text-vp-deep">Agrofinanzas</span></li>
-                            <li>Dir. Finanzas y Tesorer&iacute;a &mdash; <span class="text-vp-deep">ECOMGroup</span></li>
-                        </ul>
+                    <div class="lg:col-span-6 lg:col-start-7 flex flex-col justify-center py-2">
+                        <blockquote class="font-serif text-vp-deep text-2xl md:text-3xl lg:text-[34px] leading-[1.35] tracking-[-0.01em] mb-10">
+                            &ldquo;+25 a&ntilde;os en el sector financiero. <strong class="font-normal text-vp-gold">~USD $1,200M</strong> en arrendamiento y cr&eacute;ditos corporativos. Experto en arrendamiento industrial y desarrollo de entidades financieras (SOFOL a banco).&rdquo;
+                        </blockquote>
+                        <div>
+                            <p class="font-serif text-[17px] font-medium text-vp-deep">Jos&eacute; Antonio P&eacute;rez</p>
+                            <p class="font-serif text-[14px] text-vp-soft mt-1">Socio Fundador &middot; ex-Rabobank, ex-Bankaool</p>
+                        </div>
+                        <p class="font-serif text-[18px] font-medium text-vp-deep mt-10 tracking-[-0.01em]">Rabobank<span class="text-vp-gold">.</span></p>
                     </div>
                 </article>
 
                 <!-- Socio 2: Rafael Valladares -->
-                <article class="reveal grid grid-cols-1 lg:grid-cols-12 gap-8 py-14 border-b border-vp-deep/10">
-                    <div class="lg:col-span-3">
-                        <div class="aspect-[4/5] bg-vp-smoke border border-vp-deep/10 overflow-hidden">
-                            <img src="https://www.valper.mx/img/team/rafael-valladares.jpg" alt="Rafael Valladares - Socio Fundador de ValPer" class="w-full h-full object-cover object-top grayscale hover:grayscale-0 transition duration-700"
-                                 onerror="this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center relative\'><span class=\'font-serif text-7xl text-vp-deep/15\'>RV</span><span class=\'absolute bottom-3 left-3 text-[9px] uppercase tracking-[2px] text-gray-400\'>Foto pendiente</span></div>';">
+                <article class="reveal grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-stretch">
+                    <div class="lg:col-span-5">
+                        <div class="aspect-[5/4] bg-vp-cream relative overflow-hidden border border-vp-deep/10">
+                            <img src="images/socio-rv.jpg" alt="Rafael Valladares - Socio Fundador de ValPer"
+                                 class="w-full h-full object-cover object-top"
+                                 onerror="this.style.display='none'">
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <span class="font-serif text-[100px] md:text-[140px] text-vp-deep/12 font-light">RV</span>
+                            </div>
+                            <span class="absolute bottom-4 left-4 font-serif text-[10px] uppercase tracking-[0.22em] text-vp-deep/35">Foto pendiente</span>
                         </div>
                     </div>
-                    <div class="lg:col-span-4">
-                        <p class="text-[10px] uppercase tracking-[4px] text-vp-gold font-bold mb-3">Socio Fundador</p>
-                        <h3 class="font-serif text-3xl text-vp-deep mb-4 leading-[1.1]">Rafael Valladares</h3>
-                        <p class="text-[14px] text-gray-600 leading-[1.85]">+20 a&ntilde;os en financiamiento corporativo. <strong class="text-vp-deep">+USD $1,500M</strong> en cr&eacute;ditos sindicados (participante y agente), bursatilizaci&oacute;n, borrowing base, reportos y capital de trabajo.</p>
-                        <p class="text-[11px] uppercase tracking-[2px] text-gray-400 mt-5">MBA, Brigham Young University</p>
-                    </div>
-                    <div class="lg:col-span-5">
-                        <p class="text-[10px] uppercase tracking-[3px] text-gray-400 font-bold mb-3">Trayectoria</p>
-                        <ul class="space-y-1.5 text-[13px] text-gray-600">
-                            <li>Head Banca Corporativa &mdash; <span class="text-vp-deep">Banco Finterra</span></li>
-                            <li>Director de Cr&eacute;dito &mdash; <span class="text-vp-deep">Rabobank International</span></li>
-                            <li>Supervisor General &mdash; <span class="text-vp-deep">CNBV</span> (Grupos Financieros)</li>
-                            <li>Socio &mdash; <span class="text-vp-deep">PyMefi</span></li>
-                            <li>Socio &mdash; <span class="text-vp-deep">FGA Banqueros de Inversi&oacute;n</span></li>
-                        </ul>
+                    <div class="lg:col-span-6 lg:col-start-7 flex flex-col justify-center py-2">
+                        <blockquote class="font-serif text-vp-deep text-2xl md:text-3xl lg:text-[34px] leading-[1.35] tracking-[-0.01em] mb-10">
+                            &ldquo;+20 a&ntilde;os en financiamiento corporativo. <strong class="font-normal text-vp-gold">+USD $1,500M</strong> en cr&eacute;ditos sindicados (participante y agente), bursatilizaci&oacute;n, borrowing base, reportos y capital de trabajo.&rdquo;
+                        </blockquote>
+                        <div>
+                            <p class="font-serif text-[17px] font-medium text-vp-deep">Rafael Valladares</p>
+                            <p class="font-serif text-[14px] text-vp-soft mt-1">Socio Fundador &middot; ex-Banco Finterra, ex-CNBV</p>
+                        </div>
+                        <p class="font-serif text-[18px] font-medium text-vp-deep mt-10 tracking-[-0.01em]">Banco Finterra<span class="text-vp-gold">.</span></p>
                     </div>
                 </article>
 
                 <!-- Socio 3: Manuel Roza -->
-                <article class="reveal grid grid-cols-1 lg:grid-cols-12 gap-8 py-14 border-b border-vp-deep/10">
-                    <div class="lg:col-span-3">
-                        <div class="aspect-[4/5] bg-vp-smoke border border-vp-deep/10 flex items-center justify-center relative overflow-hidden">
-                            <span class="font-serif text-7xl text-vp-deep/15">MR</span>
-                            <span class="absolute bottom-3 left-3 text-[9px] uppercase tracking-[2px] text-gray-400">Foto pendiente</span>
+                <article class="reveal grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-stretch">
+                    <div class="lg:col-span-5">
+                        <div class="aspect-[5/4] bg-vp-cream relative overflow-hidden border border-vp-deep/10">
+                            <img src="images/socio-mr.jpg" alt="Manuel Roza - Socio de ValPer"
+                                 class="w-full h-full object-cover object-top"
+                                 onerror="this.style.display='none'">
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <span class="font-serif text-[100px] md:text-[140px] text-vp-deep/12 font-light">MR</span>
+                            </div>
+                            <span class="absolute bottom-4 left-4 font-serif text-[10px] uppercase tracking-[0.22em] text-vp-deep/35">Foto pendiente</span>
                         </div>
                     </div>
-                    <div class="lg:col-span-4">
-                        <p class="text-[10px] uppercase tracking-[4px] text-vp-gold font-bold mb-3">Socio</p>
-                        <h3 class="font-serif text-3xl text-vp-deep mb-4 leading-[1.1]">Manuel Roza</h3>
-                        <p class="text-[14px] text-gray-600 leading-[1.85]">30 a&ntilde;os en puestos directivos internacionales: telecomunicaciones, log&iacute;stica, banca, construcci&oacute;n y desarrollo industrial. Operaciones en M&eacute;xico, EE.UU. y todo el continente.</p>
-                        <p class="text-[11px] uppercase tracking-[2px] text-gray-400 mt-5">MBA, Cox School of Business (SMU)</p>
-                    </div>
-                    <div class="lg:col-span-5">
-                        <p class="text-[10px] uppercase tracking-[3px] text-gray-400 font-bold mb-3">Trayectoria</p>
-                        <ul class="space-y-1.5 text-[13px] text-gray-600">
-                            <li>Director Planeaci&oacute;n &mdash; <span class="text-vp-deep">Izzi Telecom</span></li>
-                            <li>Director Comercial &mdash; <span class="text-vp-deep">Grupo GMI</span></li>
-                            <li>Socio Director &mdash; <span class="text-vp-deep">Wolff Madrazo</span></li>
-                            <li>Director General &mdash; <span class="text-vp-deep">MEXVI</span></li>
-                            <li>Dir. Relaciones Gubernamentales LATAM &mdash; <span class="text-vp-deep">UPS</span></li>
-                        </ul>
+                    <div class="lg:col-span-6 lg:col-start-7 flex flex-col justify-center py-2">
+                        <blockquote class="font-serif text-vp-deep text-2xl md:text-3xl lg:text-[34px] leading-[1.35] tracking-[-0.01em] mb-10">
+                            &ldquo;<strong class="font-normal text-vp-gold">30 a&ntilde;os</strong> en puestos directivos internacionales: telecomunicaciones, log&iacute;stica, banca, construcci&oacute;n y desarrollo industrial. Operaciones en M&eacute;xico, EE.UU. y todo el continente.&rdquo;
+                        </blockquote>
+                        <div>
+                            <p class="font-serif text-[17px] font-medium text-vp-deep">Manuel Roza</p>
+                            <p class="font-serif text-[14px] text-vp-soft mt-1">Socio &middot; ex-UPS LATAM, ex-Izzi Telecom</p>
+                        </div>
+                        <p class="font-serif text-[18px] font-medium text-vp-deep mt-10 tracking-[-0.01em]">UPS<span class="text-vp-gold">.</span></p>
                     </div>
                 </article>
 
                 <!-- Socio 4: Javier Valadez -->
-                <article class="reveal grid grid-cols-1 lg:grid-cols-12 gap-8 py-14 border-b border-vp-deep/10">
-                    <div class="lg:col-span-3">
-                        <div class="aspect-[4/5] bg-vp-smoke border border-vp-deep/10 flex items-center justify-center relative overflow-hidden">
-                            <span class="font-serif text-7xl text-vp-deep/15">JV</span>
-                            <span class="absolute bottom-3 left-3 text-[9px] uppercase tracking-[2px] text-gray-400">Foto pendiente</span>
+                <article class="reveal grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-stretch">
+                    <div class="lg:col-span-5">
+                        <div class="aspect-[5/4] bg-vp-cream relative overflow-hidden border border-vp-deep/10">
+                            <img src="images/socio-jv.jpg" alt="Javier Valadez - Socio de ValPer"
+                                 class="w-full h-full object-cover object-top"
+                                 onerror="this.style.display='none'">
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <span class="font-serif text-[100px] md:text-[140px] text-vp-deep/12 font-light">JV</span>
+                            </div>
+                            <span class="absolute bottom-4 left-4 font-serif text-[10px] uppercase tracking-[0.22em] text-vp-deep/35">Foto pendiente</span>
                         </div>
                     </div>
-                    <div class="lg:col-span-4">
-                        <p class="text-[10px] uppercase tracking-[4px] text-vp-gold font-bold mb-3">Socio</p>
-                        <h3 class="font-serif text-3xl text-vp-deep mb-4 leading-[1.1]">Javier Valadez</h3>
-                        <p class="text-[14px] text-gray-600 leading-[1.85]">Banca corporativa y retail. Project finance en hoteles, carreteras de peaje, terminales mar&iacute;timas y privatizaciones. Autoridad de aprobaci&oacute;n hasta <strong class="text-vp-deep">USD $100M</strong>.</p>
-                        <p class="text-[11px] uppercase tracking-[2px] text-gray-400 mt-5">MBA, ITAM Corporate Finance</p>
-                    </div>
-                    <div class="lg:col-span-5">
-                        <p class="text-[10px] uppercase tracking-[3px] text-gray-400 font-bold mb-3">Trayectoria</p>
-                        <ul class="space-y-1.5 text-[13px] text-gray-600">
-                            <li>CEO &mdash; <span class="text-vp-deep">American Express Bank M&eacute;xico</span></li>
-                            <li>CEO &mdash; <span class="text-vp-deep">HSBC Colombia</span></li>
-                            <li>COO &mdash; <span class="text-vp-deep">HSBC Latam</span></li>
-                            <li>CRO &mdash; <span class="text-vp-deep">HSBC Per&uacute;</span> &amp; <span class="text-vp-deep">HSBC Panam&aacute;</span></li>
-                            <li>Corporate &amp; Investment Banking VP &mdash; <span class="text-vp-deep">HSBC</span></li>
-                        </ul>
+                    <div class="lg:col-span-6 lg:col-start-7 flex flex-col justify-center py-2">
+                        <blockquote class="font-serif text-vp-deep text-2xl md:text-3xl lg:text-[34px] leading-[1.35] tracking-[-0.01em] mb-10">
+                            &ldquo;Banca corporativa y retail. Project finance en hoteles, carreteras de peaje, terminales mar&iacute;timas y privatizaciones. Autoridad de aprobaci&oacute;n hasta <strong class="font-normal text-vp-gold">USD $100M</strong>.&rdquo;
+                        </blockquote>
+                        <div>
+                            <p class="font-serif text-[17px] font-medium text-vp-deep">Javier Valadez</p>
+                            <p class="font-serif text-[14px] text-vp-soft mt-1">Socio &middot; ex-CEO American Express Bank M&eacute;xico, ex-CEO HSBC Colombia</p>
+                        </div>
+                        <p class="font-serif text-[18px] font-medium text-vp-deep mt-10 tracking-[-0.01em]">HSBC<span class="text-vp-gold">.</span></p>
                     </div>
                 </article>
 
             </div>
-        </div>
-    </section>
-
-    <!-- CTA -->
-    <section class="relative py-32 px-6 overflow-hidden" style="background: radial-gradient(ellipse at 50% 100%, #2c2345, #0f0c18);">
-        <div class="relative z-10 max-w-3xl mx-auto text-center">
-            <p class="reveal text-vp-gold text-[12px] font-bold uppercase tracking-[5px] mb-5">Hablemos</p>
-            <h2 class="reveal font-serif text-4xl md:text-5xl text-white leading-[1.2] mb-8">&iquest;Listo para Impulsar<br>tu Empresa?</h2>
-            <p class="reveal text-gray-400 text-[17px] leading-relaxed mb-10 max-w-lg mx-auto">
-                Con m&aacute;s de 50 a&ntilde;os de experiencia combinada y USD $2,000 millones en operaciones, estructuramos la soluci&oacute;n de financiamiento adecuada para tu empresa.
-            </p>
-            <a href="#contacto" class="reveal magnetic-btn inline-flex items-center gap-3 bg-vp-gold text-vp-deep px-10 py-4 text-[12px] font-bold uppercase tracking-[2px] hover:bg-vp-gold-light transition duration-500 group">
-                <span>Comencemos</span>
-                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-            </a>
         </div>
     </section>
 
@@ -723,7 +692,7 @@
         <div class="max-w-6xl mx-auto">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
                 <div class="reveal-left lg:col-span-5">
-                    <p class="text-vp-gold text-[10px] font-bold uppercase tracking-[4px] mb-5">Contacto</p>
+                    <p class="text-vp-soft text-[11px] font-medium uppercase tracking-[0.22em] mb-6">Contacto</p>
                     <h2 class="font-serif text-4xl md:text-5xl text-vp-deep leading-[1.15] mb-8">Hablemos de su <em class="text-vp-mid">transacci&oacute;n</em>.</h2>
                     <p class="text-gray-600 text-[15px] leading-[1.85] mb-10 max-w-md">Escr&iacute;banos directamente a cualquier socio o utilice el formulario. Toda la informaci&oacute;n se trata con confidencialidad.</p>
 
@@ -786,58 +755,53 @@
         </div>
     </section>
 
-    <!-- FOOTER -->
-    <footer class="bg-vp-deep pt-20 pb-8 px-6 relative overflow-hidden">
-        <div class="absolute inset-0 opacity-[0.02]" style="background-image: linear-gradient(rgba(201,168,76,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(201,168,76,0.5) 1px, transparent 1px); background-size: 60px 60px;"></div>
-        <div class="max-w-6xl mx-auto relative z-10">
+    <!-- FOOTER — light, editorial -->
+    <footer class="bg-vp-cream pt-20 pb-8 px-6 md:px-10 border-t border-vp-deep/10">
+        <div class="max-w-7xl mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
                 <div class="md:col-span-1">
                     <div class="mb-5 flex items-center gap-3">
                         <svg width="36" height="36" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="1" y="1" width="42" height="42" stroke="#c9a84c" stroke-width="1.5" fill="none"/>
-                            <text x="8" y="30" font-family="Playfair Display, serif" font-size="22" font-weight="700" fill="white">VP</text>
+                            <rect x="1" y="1" width="42" height="42" stroke="#0E1A2B" stroke-width="1.25" fill="none"/>
+                            <text x="8" y="30" font-family="Newsreader, serif" font-size="22" font-weight="400" fill="#0E1A2B">VP</text>
                         </svg>
-                        <div>
-                            <span class="text-sm font-bold tracking-[3px] text-white">VALPER</span>
-                        </div>
+                        <span class="font-serif text-[14px] font-medium tracking-[0.18em] text-vp-deep">VALPER</span>
                     </div>
-                    <p class="text-xs text-gray-500 leading-[1.8] mb-4">Boutique de banca de inversi&oacute;n. M&aacute;s de 50 a&ntilde;os de experiencia combinada en estructuraci&oacute;n de capital y deuda.</p>
-                    <p class="text-[11px] text-vp-gold uppercase tracking-[2px]">Inteligencia Financiera</p>
+                    <p class="font-serif text-[13px] text-vp-soft leading-[1.8] mb-4">Boutique de banca de inversi&oacute;n. M&aacute;s de 50 a&ntilde;os de experiencia combinada en estructuraci&oacute;n de capital y deuda.</p>
+                    <p class="font-serif text-[11px] text-vp-soft uppercase tracking-[0.22em]">Inteligencia Financiera</p>
                 </div>
                 <div>
-                    <h4 class="text-[11px] font-bold uppercase tracking-[2px] text-gray-400 mb-5">Navegaci&oacute;n</h4>
+                    <h4 class="font-serif text-[11px] font-medium uppercase tracking-[0.22em] text-vp-soft mb-5">Navegaci&oacute;n</h4>
                     <ul class="space-y-3">
-                        <li><a href="#compania" class="text-xs text-gray-500 hover:text-vp-gold transition duration-500">Compa&ntilde;&iacute;a</a></li>
-                        <li><a href="#proceso" class="text-xs text-gray-500 hover:text-vp-gold transition duration-500">Proceso</a></li>
-                        <li><a href="#productos" class="text-xs text-gray-500 hover:text-vp-gold transition duration-500">Productos</a></li>
-                        <li><a href="#inmobiliario" class="text-xs text-gray-500 hover:text-vp-gold transition duration-500">Sector Inmobiliario</a></li>
-                        <li><a href="#valor" class="text-xs text-gray-500 hover:text-vp-gold transition duration-500">Por qu&eacute; ValPer</a></li>
+                        <li><a href="#compania" class="font-serif text-[13px] text-vp-deep/70 hover:text-vp-deep transition duration-300">Compa&ntilde;&iacute;a</a></li>
+                        <li><a href="#proceso" class="font-serif text-[13px] text-vp-deep/70 hover:text-vp-deep transition duration-300">Proceso</a></li>
+                        <li><a href="#productos" class="font-serif text-[13px] text-vp-deep/70 hover:text-vp-deep transition duration-300">Productos</a></li>
+                        <li><a href="#valor" class="font-serif text-[13px] text-vp-deep/70 hover:text-vp-deep transition duration-300">Por qu&eacute; ValPer</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="text-[11px] font-bold uppercase tracking-[2px] text-gray-400 mb-5">Empresa</h4>
+                    <h4 class="font-serif text-[11px] font-medium uppercase tracking-[0.22em] text-vp-soft mb-5">Empresa</h4>
                     <ul class="space-y-3">
-                        <li><a href="#nosotros" class="text-xs text-gray-500 hover:text-vp-gold transition duration-500">Socios</a></li>
-                        <li><a href="#comencemos" class="text-xs text-gray-500 hover:text-vp-gold transition duration-500">Honorarios</a></li>
-                        <li><a href="#contacto" class="text-xs text-gray-500 hover:text-vp-gold transition duration-500">Contacto</a></li>
-                        <li><a href="#" class="text-xs text-gray-500 hover:text-vp-gold transition duration-500">Aviso de Privacidad</a></li>
+                        <li><a href="#nosotros" class="font-serif text-[13px] text-vp-deep/70 hover:text-vp-deep transition duration-300">Socios</a></li>
+                        <li><a href="#contacto" class="font-serif text-[13px] text-vp-deep/70 hover:text-vp-deep transition duration-300">Contacto</a></li>
+                        <li><a href="#" class="font-serif text-[13px] text-vp-deep/70 hover:text-vp-deep transition duration-300">Aviso de Privacidad</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h4 class="text-[11px] font-bold uppercase tracking-[2px] text-gray-400 mb-5">Contacto Socios</h4>
+                    <h4 class="font-serif text-[11px] font-medium uppercase tracking-[0.22em] text-vp-soft mb-5">Contacto Socios</h4>
                     <ul class="space-y-2">
-                        <li><a href="mailto:manuel.rozatrevino@valper.mx" class="text-[11px] text-gray-500 hover:text-vp-gold transition duration-500 block">manuel.rozatrevino@valper.mx</a></li>
-                        <li><a href="mailto:rafael.valladares@valper.mx" class="text-[11px] text-gray-500 hover:text-vp-gold transition duration-500 block">rafael.valladares@valper.mx</a></li>
-                        <li><a href="mailto:javier.valadez@valper.mx" class="text-[11px] text-gray-500 hover:text-vp-gold transition duration-500 block">javier.valadez@valper.mx</a></li>
-                        <li><a href="mailto:josea.perez@valper.mx" class="text-[11px] text-gray-500 hover:text-vp-gold transition duration-500 block">josea.perez@valper.mx</a></li>
-                        <li class="pt-2"><a href="https://www.valper.mx" target="_blank" rel="noopener" class="text-xs text-vp-gold hover:text-vp-gold-light transition duration-500">www.valper.mx &rarr;</a></li>
+                        <li><a href="mailto:manuel.rozatrevino@valper.mx" class="font-serif text-[12px] text-vp-deep/70 hover:text-vp-deep transition duration-300 block">manuel.rozatrevino@valper.mx</a></li>
+                        <li><a href="mailto:rafael.valladares@valper.mx" class="font-serif text-[12px] text-vp-deep/70 hover:text-vp-deep transition duration-300 block">rafael.valladares@valper.mx</a></li>
+                        <li><a href="mailto:javier.valadez@valper.mx" class="font-serif text-[12px] text-vp-deep/70 hover:text-vp-deep transition duration-300 block">javier.valadez@valper.mx</a></li>
+                        <li><a href="mailto:josea.perez@valper.mx" class="font-serif text-[12px] text-vp-deep/70 hover:text-vp-deep transition duration-300 block">josea.perez@valper.mx</a></li>
+                        <li class="pt-3"><a href="https://www.valper.mx" target="_blank" rel="noopener" class="font-serif text-[13px] text-vp-deep hover:opacity-70 transition duration-300">www.valper.mx &rarr;</a></li>
                     </ul>
                 </div>
             </div>
-            <div class="border-t border-white/5 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-[10px] text-gray-600">&copy; 2026 ValPer &ndash; Inteligencia Financiera. Todos los derechos reservados.</p>
-                <p class="text-[10px] text-gray-600 uppercase tracking-[2px]">Actualizado &bull; Abril 2026</p>
-                <a href="#hero" class="text-[10px] text-gray-600 hover:text-vp-gold transition duration-500 uppercase tracking-[2px]">Volver arriba &uarr;</a>
+            <div class="border-t border-vp-deep/10 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="font-serif text-[11px] text-vp-soft">&copy; 2026 ValPer &ndash; Inteligencia Financiera. Todos los derechos reservados.</p>
+                <p class="font-serif text-[11px] text-vp-soft uppercase tracking-[0.22em]">Actualizado &bull; Abril 2026</p>
+                <a href="#hero" class="font-serif text-[11px] text-vp-soft hover:text-vp-deep transition duration-300 uppercase tracking-[0.22em]">Volver arriba &uarr;</a>
             </div>
         </div>
     </footer>
